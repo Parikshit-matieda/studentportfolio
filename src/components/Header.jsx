@@ -1,18 +1,24 @@
+import { NavLink, Link } from 'react-router-dom';
 import './Header.css';
 
-function Header({ name, title, theme, toggleTheme }) {
+function Header({ name, theme, toggleTheme }) {
   return (
-    <header className="header" id="header">
+    <header className="navbar-header">
       <div className="header-container">
-        <div className="header-logo">
+        <Link to="/" className="header-logo">
           <span className="logo-icon">◈</span>
           <span className="logo-text">Portfolio</span>
-        </div>
+        </Link>
         <nav className="header-nav" id="main-nav">
-          <a href="#about" className="nav-link">About</a>
-          <a href="#skills" className="nav-link">Skills</a>
-          <a href="#projects" className="nav-link">Projects</a>
-          <a href="#footer" className="nav-link">Contact</a>
+          <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Home
+          </NavLink>
+          <NavLink to="/projects" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Projects
+          </NavLink>
+          <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Contact
+          </NavLink>
           <button 
             className="theme-toggle" 
             onClick={toggleTheme} 
@@ -39,18 +45,9 @@ function Header({ name, title, theme, toggleTheme }) {
           </button>
         </nav>
       </div>
-      <div className="hero-section" id="hero">
-        <div className="hero-badge">👋 Welcome to my portfolio</div>
-        <h1 className="hero-name">{name}</h1>
-        <p className="hero-title">{title}</p>
-        <div className="hero-cta">
-          <a href="#projects" className="btn btn-primary">View My Work</a>
-          <a href="#footer" className="btn btn-outline">Get in Touch</a>
-        </div>
-        <div className="hero-glow"></div>
-      </div>
     </header>
   );
 }
 
 export default Header;
+

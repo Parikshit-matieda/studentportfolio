@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
-import About from './components/About';
-import Skills from './components/Skills';
+import Home from './components/Home';
 import Projects from './components/Projects';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
-import PostgresLogo from './components/PostgresLogo';
 
 /* ─── Data passed as props to components ─── */
 const studentName = "Parikshit Matieda";
@@ -182,6 +182,14 @@ const socialLinksData = [
   },
 ];
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'light';
@@ -210,33 +218,43 @@ function App() {
   };
 
   return (
-    <div className="app">
-      {/* Scroll Progress Bar */}
-      <div 
-        className="scroll-progress-bar" 
-        style={{ width: `${scrollProgress}%` }}
-      ></div>
+    <HashRouter>
+      <ScrollToTop />
+      <div className="app">
+        {/* Scroll Progress Bar */}
+        <div 
+          className="scroll-progress-bar" 
+          style={{ width: `${scrollProgress}%` }}
+        ></div>
 
-      {/* Props: name, title, theme, toggleTheme */}
-      <Header 
-        name={studentName} 
-        title={studentTitle} 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
-      />
+        {/* Props: name, theme, toggleTheme */}
+        <Header 
+          name={studentName} 
+          theme={theme} 
+          toggleTheme={toggleTheme} 
+        />
 
-      {/* No props — self-contained bio section */}
-      <About />
+        <main className="main-content">
+          <Routes>
+            <Route 
+              path="/" 
+              element={<Home name={studentName} title={studentTitle} skills={skillsData} />} 
+            />
+            <Route 
+              path="/projects" 
+              element={<Projects projects={projectsData} />} 
+            />
+            <Route 
+              path="/contact" 
+              element={<Contact email={contactEmail} />} 
+            />
+          </Routes>
+        </main>
 
-      {/* Props: skills array */}
-      <Skills skills={skillsData} />
-
-      {/* Props: projects array */}
-      <Projects projects={projectsData} />
-
-      {/* Props: email, socialLinks */}
-      <Footer email={contactEmail} socialLinks={socialLinksData} />
-    </div>
+        {/* Props: email, socialLinks */}
+        <Footer email={contactEmail} socialLinks={socialLinksData} />
+      </div>
+    </HashRouter>
   );
 }
 
