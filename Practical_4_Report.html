@@ -225,7 +225,7 @@
     <div class="section">
       <div class="section-title"><span>3.</span> Server & Middleware Code Implementation</div>
 
-      <p><strong>A) Request Logging Middleware (<code>practical4/middleware/logger.js</code>):</strong></p>
+      <p><strong>A) Request Logging Middleware (<code>backend/middleware/logger.js</code>):</strong></p>
       <div class="code-box">
 <span class="keyword">const</span> requestLogger = (req, res, next) =&gt; {<br>
 &nbsp;&nbsp;<span class="keyword">const</span> timestamp = <span class="keyword">new</span> Date().toISOString();<br>
@@ -235,7 +235,7 @@
 <span class="keyword">export default</span> requestLogger;
       </div>
 
-      <p><strong>B) Global Error Handling Middleware (<code>practical4/middleware/errorHandler.js</code>):</strong></p>
+      <p><strong>B) Global Error Handling Middleware (<code>backend/middleware/errorHandler.js</code>):</strong></p>
       <div class="code-box">
 <span class="keyword">const</span> errorHandler = (err, req, res, next) =&gt; {<br>
 &nbsp;&nbsp;<span class="keyword">const</span> statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;<br>
@@ -250,7 +250,7 @@
 <span class="keyword">export default</span> errorHandler;
       </div>
 
-      <p><strong>C) Express Server Assembly (<code>practical4/server.js</code>):</strong></p>
+      <p><strong>C) Express Server Assembly (<code>backend/server.js</code>):</strong></p>
       <div class="code-box">
 <span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">'express'</span>;<br>
 <span class="keyword">import</span> cors <span class="keyword">from</span> <span class="string">'cors'</span>;<br>

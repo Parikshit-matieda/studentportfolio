@@ -46,7 +46,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`====================================================================`);
-  console.log(`🚀 CHARUSAT AWD Practical 4 - Task REST API Server Running`);
+  console.log(`🚀 Task REST API Backend Server Running`);
   console.log(`📍 Base URL: http://localhost:${PORT}`);
   console.log(`📌 Endpoints:`);
   console.log(`   - GET    /tasks         (getAllTasks)`);
