@@ -1,0 +1,96 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 5 - Mongoose & MongoDB REST API",
+  "collectionId": "practical5-mongoose-api",
+  "dateExported": "2026-10-04T18:30:00.000Z",
+  "version": "1.0",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "req-p5-1",
+      "colId": "practical5-mongoose-api",
+      "containerId": "",
+      "name": "1. GET All Tasks (MongoDB)",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-10-04T18:30:00.000Z",
+      "modified": "2026-10-04T18:30:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-p5-2",
+      "colId": "practical5-mongoose-api",
+      "containerId": "",
+      "name": "2. POST Create Task (Mongoose Valid)",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2026-10-04T18:30:00.000Z",
+      "modified": "2026-10-04T18:30:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Mongoose Schema & MongoDB Test\",\n  \"description\": \"Persisting documents to MongoDB database via Mongoose ODM model\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-p5-3",
+      "colId": "practical5-mongoose-api",
+      "containerId": "",
+      "name": "3. POST Test Schema Validation Error (Missing Title)",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-10-04T18:30:00.000Z",
+      "modified": "2026-10-04T18:30:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"description\": \"Attempting to insert task document without required title field\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-p5-4",
+      "colId": "practical5-mongoose-api",
+      "containerId": "",
+      "name": "4. GET Test Mongoose CastError (Invalid ObjectId)",
+      "url": "http://localhost:5000/tasks/invalid-object-id-1234",
+      "method": "GET",
+      "sortNum": 40000,
+      "created": "2026-10-04T18:30:00.000Z",
+      "modified": "2026-10-04T18:30:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-p5-5",
+      "colId": "practical5-mongoose-api",
+      "containerId": "",
+      "name": "5. GET 500 Global Error Handler Test",
+      "url": "http://localhost:5000/error-test",
+      "method": "GET",
+      "sortNum": 50000,
+      "created": "2026-10-04T18:30:00.000Z",
+      "modified": "2026-10-04T18:30:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    }
+  ]
+}

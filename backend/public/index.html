@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Practical 4: RESTful API Tester - Task Management System</title>
+  <title>Practical 5: MongoDB & Mongoose Schema Validation Tester</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -42,119 +42,67 @@
     }
 
     header {
-      background: linear-gradient(135deg, rgba(31,41,55,0.8), rgba(17,24,39,0.95));
-      border: 1px solid var(--card-border);
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(17,24,39,0.95));
+      border: 1px solid rgba(16,185,129,0.3);
       border-radius: 12px;
       padding: 1.5rem 2rem;
       margin-bottom: 2rem;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
-    .university-badge {
+    .badge {
+      display: inline-block;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.4);
       font-size: 0.75rem;
-      letter-spacing: 0.1em;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
       text-transform: uppercase;
-      color: var(--accent-blue);
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--text-primary);
+      letter-spacing: 0.05em;
       margin-bottom: 0.5rem;
     }
 
-    .meta-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      font-size: 0.88rem;
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
       color: var(--text-secondary);
-      border-top: 1px solid var(--card-border);
-      padding-top: 0.75rem;
-      margin-top: 0.75rem;
+      font-size: 0.95rem;
     }
 
-    .meta-item strong {
-      color: #e5e7eb;
-    }
-
-    /* Architecture Diagram Widget */
-    .arch-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .arch-card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      color: var(--accent-purple);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .pipeline-diagram {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding: 1rem 0;
-    }
-
-    .node {
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      text-align: center;
-      min-width: 140px;
-    }
-
-    .node.client { border-color: var(--accent-blue); color: #93c5fd; }
-    .node.middleware { border-color: var(--accent-amber); color: #fde68a; }
-    .node.router { border-color: var(--accent-green); color: #6ee7b7; }
-    .node.error { border-color: var(--accent-red); color: #fca5a5; }
-
-    .node-title { font-weight: 600; font-size: 0.85rem; }
-    .node-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; }
-
-    .arrow {
-      color: var(--text-secondary);
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-
-    /* Grid Layout */
-    .main-grid {
+    .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     @media (max-width: 900px) {
-      .main-grid { grid-template-columns: 1fr; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
 
-    /* Action Buttons Box */
-    .section-box {
-      background: var(--card-bg);
+    .card {
+      background-color: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 1.5rem;
-      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .section-title {
+    .card-title {
       font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
       color: var(--text-primary);
     }
 
@@ -165,13 +113,13 @@
       margin-bottom: 1.25rem;
     }
 
-    .btn {
-      padding: 0.6rem 1rem;
+    button {
       font-family: 'Inter', sans-serif;
       font-size: 0.85rem;
       font-weight: 600;
+      padding: 0.6rem 1rem;
       border-radius: 6px;
-      border: 1px solid transparent;
+      border: none;
       cursor: pointer;
       transition: all 0.2s ease;
       display: inline-flex;
@@ -179,332 +127,352 @@
       gap: 0.5rem;
     }
 
-    .btn-get { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); }
-    .btn-get:hover { background: rgba(59, 130, 246, 0.3); }
+    .btn-get {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .btn-get:hover {
+      background-color: var(--accent-blue);
+      color: white;
+    }
 
-    .btn-post { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
-    .btn-post:hover { background: rgba(16, 185, 129, 0.3); }
+    .btn-post {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .btn-post:hover {
+      background-color: var(--accent-green);
+      color: white;
+    }
 
-    .btn-put { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
-    .btn-put:hover { background: rgba(245, 158, 11, 0.3); }
+    .btn-put {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .btn-put:hover {
+      background-color: var(--accent-amber);
+      color: white;
+    }
 
-    .btn-delete { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
-    .btn-delete:hover { background: rgba(239, 68, 68, 0.3); }
-
-    .btn-err { background: rgba(139, 92, 246, 0.15); color: #c084fc; border-color: rgba(139, 92, 246, 0.4); }
-    .btn-err:hover { background: rgba(139, 92, 246, 0.3); }
+    .btn-delete {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .btn-delete:hover {
+      background-color: var(--accent-red);
+      color: white;
+    }
 
     .form-group {
       margin-bottom: 1rem;
     }
 
-    .form-group label {
+    label {
       display: block;
       font-size: 0.8rem;
+      font-weight: 500;
       color: var(--text-secondary);
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.4rem;
     }
 
-    .form-control {
+    input, textarea {
       width: 100%;
-      background: var(--code-bg);
+      background-color: var(--code-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 0.6rem;
+      padding: 0.6rem 0.8rem;
       color: var(--text-primary);
       font-family: 'Fira Code', monospace;
       font-size: 0.85rem;
-    }
-
-    .form-control:focus {
       outline: none;
-      border-color: var(--accent-blue);
     }
 
-    /* Response Console */
-    .response-card {
-      background: var(--code-bg);
+    input:focus, textarea:focus {
+      border-color: var(--accent-green);
+    }
+
+    .response-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-tag {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .status-200, .status-201 {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+    }
+
+    .status-400, .status-404, .status-500 {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: var(--accent-red);
+    }
+
+    pre {
+      background-color: var(--code-bg);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 1.25rem;
+      padding: 1rem;
       font-family: 'Fira Code', monospace;
       font-size: 0.85rem;
+      color: #e5e7eb;
       overflow-x: auto;
+      max-height: 480px;
     }
 
-    .res-header {
+    .task-list {
+      margin-top: 1rem;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--card-border);
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .status-pill {
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 0.75rem;
-    }
-
-    .status-200, .status-201 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-    .status-400, .status-404 { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-    .status-500 { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-
-    .json-code {
-      color: #93c5fd;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    /* Task List Preview */
-    .task-card {
-      background: #1f2937;
-      border: 1px solid #374151;
+    .task-item {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
+      padding: 0.8rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .task-item.completed {
+      opacity: 0.6;
     }
 
     .task-title {
       font-weight: 600;
-      font-size: 0.95rem;
-      color: #f3f4f6;
+      font-size: 0.9rem;
     }
 
-    .task-desc {
-      font-size: 0.8rem;
+    .task-meta {
+      font-size: 0.75rem;
       color: var(--text-secondary);
-      margin-top: 0.2rem;
+      font-family: 'Fira Code', monospace;
     }
-
-    .badge-status {
-      font-size: 0.7rem;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .badge-completed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <div class="university-badge">CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY • FTE</div>
-      <h1>Practical 4: RESTful API with Node.js & Express</h1>
-      <div class="meta-bar">
-        <div class="meta-item">Course: <strong>Advanced Web Development Frameworks (ITUE301)</strong></div>
-        <div class="meta-item">Student: <strong>Parikshit Matieda (24IT049)</strong></div>
-        <div class="meta-item">CO/PO: <strong>CO2 / PO3, PO5</strong></div>
-      </div>
-    </header>
+<div class="container">
+  <header>
+    <div class="badge">CHARUSAT AWD Practical 5</div>
+    <h1>MongoDB Integration & Mongoose Schema Design</h1>
+    <p class="subtitle">Live interactive API tester communicating with MongoDB database via Mongoose ODM model operations</p>
+  </header>
 
-    <!-- Architecture Diagram -->
-    <div class="arch-card">
-      <h3>⚡ Express Middleware Pipeline Architecture</h3>
-      <div class="pipeline-diagram">
-        <div class="node client">
-          <div class="node-title">Client</div>
-          <div class="node-desc">Postman / Browser</div>
-        </div>
-        <div class="arrow">➔</div>
-        <div class="node middleware">
-          <div class="node-title">[Logging Middleware]</div>
-          <div class="node-desc">Timestamp + Method + URL</div>
-        </div>
-        <div class="arrow">➔</div>
-        <div class="node router">
-          <div class="node-title">Express Router</div>
-          <div class="node-desc">CRUD Handlers (/tasks)</div>
-        </div>
-        <div class="arrow">➔</div>
-        <div class="node error">
-          <div class="node-title">[Global Error Handler]</div>
-          <div class="node-desc">500 JSON Response</div>
-        </div>
+  <div class="grid">
+    <!-- Operations Panel -->
+    <div class="card">
+      <div class="card-title">⚡ Test Endpoints & Schema Validation</div>
+      
+      <div class="btn-group">
+        <button class="btn-get" onclick="fetchAllTasks()">GET /tasks</button>
+        <button class="btn-get" onclick="fetchTaskById()">GET /tasks/:id</button>
+        <button class="btn-post" onclick="testValidationError()">Test Schema Validation (Missing Title)</button>
+        <button class="btn-delete" onclick="testCastError()">Test CastError (Invalid ID)</button>
+        <button class="btn-delete" onclick="trigger500Error()">GET /error-test (500)</button>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 1.5rem 0;">
+
+      <div class="card-title">📝 Create / Update Task</div>
+      <div class="form-group">
+        <label for="taskIdInput">Target Task ID (MongoDB ObjectId for GET / PUT / DELETE):</label>
+        <input type="text" id="taskIdInput" placeholder="e.g. 67001a2b3c4d5e6f7a8b9c0d">
+      </div>
+      <div class="form-group">
+        <label for="taskTitle">Task Title (Mongoose Required Field):</label>
+        <input type="text" id="taskTitle" placeholder="e.g. Implement Mongoose Schema Validation">
+      </div>
+      <div class="form-group">
+        <label for="taskDesc">Task Description:</label>
+        <textarea id="taskDesc" rows="2" placeholder="e.g. Connect MongoDB URI and handle CastError"></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-post" onclick="createNewTask()">POST /tasks (Create)</button>
+        <button class="btn-put" onclick="updateExistingTask()">PUT /tasks/:id (Update)</button>
+        <button class="btn-delete" onclick="deleteTargetTask()">DELETE /tasks/:id (Delete)</button>
       </div>
     </div>
 
-    <!-- Main Grid -->
-    <div class="main-grid">
-      <!-- Left Column: Controls -->
-      <div>
-        <div class="section-box">
-          <div class="section-title">🧪 API Test Controller</div>
-          
-          <div class="btn-group">
-            <button class="btn btn-get" onclick="executeGetTasks()">GET /tasks</button>
-            <button class="btn btn-get" onclick="executeGetTaskById(1)">GET /tasks/1</button>
-            <button class="btn btn-post" onclick="executeCreateTask()">POST /tasks</button>
-            <button class="btn btn-put" onclick="executeUpdateTask(1)">PUT /tasks/1</button>
-            <button class="btn btn-delete" onclick="executeDeleteTask(2)">DELETE /tasks/2</button>
-          </div>
-
-          <div style="border-top: 1px solid var(--card-border); margin: 1rem 0; padding-top: 1rem;">
-            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">
-              ⚠️ Error Handling Tests
-            </div>
-            <div class="btn-group">
-              <button class="btn btn-put" onclick="executeGetTaskById(999)">GET /tasks/999 (404 Test)</button>
-              <button class="btn btn-err" onclick="executeTriggerError()">GET /error-test (500 Test)</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-box">
-          <div class="section-title">✍️ Custom Task Form (POST/PUT)</div>
-          <div class="form-group">
-            <label>Task Title</label>
-            <input type="text" id="inputTitle" class="form-control" placeholder="e.g., Implement Auth Middleware">
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <input type="text" id="inputDesc" class="form-control" placeholder="e.g., Add JWT token verification to routes">
-          </div>
-          <div class="btn-group">
-            <button class="btn btn-post" onclick="submitCustomTask()">Submit POST /tasks</button>
-          </div>
-        </div>
+    <!-- Live JSON Response Viewer -->
+    <div class="card">
+      <div class="response-header">
+        <div class="card-title">📡 Server JSON Response Output</div>
+        <div id="statusBadge" class="status-tag status-200">READY</div>
       </div>
+      <pre id="jsonOutput">// Click any button on the left to trigger real Mongoose API requests against MongoDB</pre>
 
-      <!-- Right Column: Live Output Console & Current State -->
-      <div>
-        <div class="section-box">
-          <div class="section-title">📡 Live Response Console</div>
-          <div class="response-card">
-            <div class="res-header">
-              <div id="reqBadge" style="font-size: 0.8rem; color: #9ca3af;">Method: GET /tasks</div>
-              <div id="statusPill" class="status-pill status-200">200 OK</div>
-            </div>
-            <pre id="jsonViewer" class="json-code">Click any endpoint button above to test the REST API server.</pre>
-          </div>
-        </div>
-
-        <div class="section-box">
-          <div class="section-title">📋 Current In-Memory Tasks Array</div>
-          <div id="taskList">
-            <!-- Dynamic Tasks Rendered Here -->
-          </div>
+      <div style="margin-top: 1.5rem;">
+        <div class="card-title">📋 Live Database Tasks</div>
+        <div id="liveTaskList" class="task-list">
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Click "GET /tasks" to populate live database documents.</p>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    async function fetchAndRenderState() {
-      try {
-        const res = await fetch('/tasks');
-        const data = await res.json();
-        const taskList = document.getElementById('taskList');
-        taskList.innerHTML = '';
+<script>
+  const outputEl = document.getElementById('jsonOutput');
+  const statusEl = document.getElementById('statusBadge');
+  const taskListEl = document.getElementById('liveTaskList');
 
-        if (data.data && data.data.length > 0) {
-          data.data.forEach(t => {
-            const card = document.createElement('div');
-            card.className = 'task-card';
-            card.innerHTML = `
-              <div>
-                <div class="task-title">#${t.id} - ${t.title}</div>
-                <div class="task-desc">${t.description || 'No description provided'}</div>
-              </div>
-              <span class="badge-status ${t.completed ? 'badge-completed' : 'badge-pending'}">
-                ${t.completed ? '✓ Completed' : '⏳ Pending'}
-              </span>
-            `;
-            taskList.appendChild(card);
-          });
-        } else {
-          taskList.innerHTML = '<div style="color:#6b7280; font-size:0.85rem;">No tasks remaining in-memory.</div>';
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  function updateOutput(status, data) {
+    statusEl.textContent = `STATUS ${status}`;
+    statusEl.className = `status-tag status-${status}`;
+    outputEl.textContent = JSON.stringify(data, null, 2);
+  }
 
-    function updateConsole(method, url, status, data) {
-      document.getElementById('reqBadge').innerText = `${method} ${url}`;
-      const pill = document.getElementById('statusPill');
-      pill.innerText = `${status} Status`;
-      pill.className = `status-pill status-${status}`;
-      document.getElementById('jsonViewer').innerText = JSON.stringify(data, null, 2);
-      fetchAndRenderState();
-    }
-
-    async function executeGetTasks() {
+  async function fetchAllTasks() {
+    try {
       const res = await fetch('/tasks');
       const data = await res.json();
-      updateConsole('GET', '/tasks', res.status, data);
-    }
+      updateOutput(res.status, data);
 
-    async function executeGetTaskById(id) {
+      if (data.success && Array.isArray(data.data)) {
+        renderTaskList(data.data);
+      }
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
+    }
+  }
+
+  function renderTaskList(tasks) {
+    if (tasks.length === 0) {
+      taskListEl.innerHTML = '<p style="font-size:0.85rem; color:var(--text-secondary);">No tasks in database.</p>';
+      return;
+    }
+    taskListEl.innerHTML = tasks.map(t => `
+      <div class="task-item ${t.completed ? 'completed' : ''}">
+        <div>
+          <div class="task-title">${t.completed ? '✅' : '📌'} ${t.title}</div>
+          <div class="task-meta">ID: ${t._id || t.id} | ${t.description || 'No description'}</div>
+        </div>
+        <button class="btn-get" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="selectTask('${t._id || t.id}', '${t.title.replace(/'/g, "\\'")}', '${(t.description||'').replace(/'/g, "\\'")}')">Select</button>
+      </div>
+    `).join('');
+  }
+
+  function selectTask(id, title, desc) {
+    document.getElementById('taskIdInput').value = id;
+    document.getElementById('taskTitle').value = title;
+    document.getElementById('taskDesc').value = desc;
+  }
+
+  async function fetchTaskById() {
+    const id = document.getElementById('taskIdInput').value.trim();
+    if (!id) return alert('Please enter a target Task ID');
+    try {
       const res = await fetch(`/tasks/${id}`);
       const data = await res.json();
-      updateConsole('GET', `/tasks/${id}`, res.status, data);
+      updateOutput(res.status, data);
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
     }
+  }
 
-    async function executeCreateTask() {
-      const res = await fetch('/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: "Verify API Endpoints in Postman",
-          description: "Test status codes 200, 201, 404, and 500 across Express router"
-        })
-      });
-      const data = await res.json();
-      updateConsole('POST', '/tasks', res.status, data);
-    }
-
-    async function submitCustomTask() {
-      const title = document.getElementById('inputTitle').value;
-      const description = document.getElementById('inputDesc').value;
-
+  async function createNewTask() {
+    const title = document.getElementById('taskTitle').value;
+    const description = document.getElementById('taskDesc').value;
+    try {
       const res = await fetch('/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description })
       });
       const data = await res.json();
-      updateConsole('POST', '/tasks', res.status, data);
+      updateOutput(res.status, data);
+      if (res.ok) fetchAllTasks();
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
     }
+  }
 
-    async function executeUpdateTask(id) {
+  async function updateExistingTask() {
+    const id = document.getElementById('taskIdInput').value.trim();
+    if (!id) return alert('Please enter a target Task ID');
+    const title = document.getElementById('taskTitle').value;
+    const description = document.getElementById('taskDesc').value;
+    try {
       const res = await fetch(`/tasks/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          completed: true,
-          description: "Updated task description via Express PUT route"
-        })
+        body: JSON.stringify({ title, description, completed: true })
       });
       const data = await res.json();
-      updateConsole('PUT', `/tasks/${id}`, res.status, data);
+      updateOutput(res.status, data);
+      if (res.ok) fetchAllTasks();
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
     }
+  }
 
-    async function executeDeleteTask(id) {
-      const res = await fetch(`/tasks/${id}`, {
-        method: 'DELETE'
+  async function deleteTargetTask() {
+    const id = document.getElementById('taskIdInput').value.trim();
+    if (!id) return alert('Please enter a target Task ID');
+    try {
+      const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      updateOutput(res.status, data);
+      if (res.ok) fetchAllTasks();
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
+    }
+  }
+
+  async function testValidationError() {
+    try {
+      const res = await fetch('/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: 'Testing missing title for Mongoose schema validation' })
       });
       const data = await res.json();
-      updateConsole('DELETE', `/tasks/${id}`, res.status, data);
+      updateOutput(res.status, data);
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
     }
+  }
 
-    async function executeTriggerError() {
+  async function testCastError() {
+    try {
+      const res = await fetch('/tasks/invalid-object-id-12345');
+      const data = await res.json();
+      updateOutput(res.status, data);
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
+    }
+  }
+
+  async function trigger500Error() {
+    try {
       const res = await fetch('/error-test');
       const data = await res.json();
-      updateConsole('GET', '/error-test', res.status, data);
+      updateOutput(res.status, data);
+    } catch (err) {
+      updateOutput(500, { success: false, error: err.message });
     }
+  }
 
-    // Initial load
-    executeGetTasks();
-  </script>
+  // Load all tasks on startup
+  fetchAllTasks();
+</script>
 
 </body>
 </html>

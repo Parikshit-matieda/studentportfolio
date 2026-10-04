@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 5 Report - MongoDB Integration and Schema Design with Mongoose</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text-main: #c9d1d9;
+      --text-heading: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-purple: #bc8cff;
+      --accent-amber: #d29922;
+      --accent-red: #f85149;
+      --code-bg: #011627;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .university-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .header h1 {
+      color: var(--text-heading);
+      margin: 0.25rem 0 0.5rem 0;
+      font-size: 1.8rem;
+    }
+    .meta-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: #8b949e;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    .meta-item strong {
+      color: var(--accent);
+    }
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-title {
+      color: var(--text-heading);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+      padding-bottom: 0.5rem;
+    }
+    .section-title span {
+      color: var(--accent-green);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .info-box {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .diagram-box {
+      background: #040d21;
+      border: 1px dashed var(--accent-green);
+      border-radius: 8px;
+      padding: 1.2rem;
+      font-family: monospace;
+      color: var(--accent-green);
+      white-space: pre;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: "Fira Code", Consolas, Monaco, monospace;
+      font-size: 0.85rem;
+      color: #d6deeb;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .keyword { color: #c792ea; }
+    .string { color: #ecc48d; }
+    .function { color: #82aaff; }
+    .number { color: #f78c6c; }
+    .comment { color: #637777; font-style: italic; }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-200, .badge-201 { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+    .badge-400, .badge-404, .badge-500 { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header Metadata -->
+  <div class="header">
+    <div class="university-title">CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY — FTE</div>
+    <h1>Practical 5: MongoDB Integration and Schema Design with Mongoose</h1>
+    <div class="meta-info">
+      <div class="meta-item"><strong>Course:</strong> Advanced Web Development Frameworks (ITUE301)</div>
+      <div class="meta-item"><strong>Department:</strong> B. Tech (IT / CE / CSE / AIML)</div>
+      <div class="meta-item"><strong>CO/PO:</strong> CO2, CO3 / PO3, PO5</div>
+    </div>
+  </div>
+
+  <!-- Objective & Overview -->
+  <div class="section">
+    <div class="section-title"><span>1.</span> Practical Objective & Overview</div>
+    <div class="info-box">
+      <strong>Objective:</strong> To connect a NoSQL MongoDB database to an Express server using Mongoose ODM, enforce strict data validation via a Mongoose Schema, replace in-memory data structures with async database model queries, and return structured JSON for validation/cast errors.
+    </div>
+    <p>
+      In Practical 4, task data was stored transiently in an in-memory JavaScript array. Practical 5 upgrades the backend to persist data permanently in a local MongoDB database instance using Mongoose. Mongoose provides schema validation (required fields, trim, data types, default values) before any document is written to MongoDB.
+    </p>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <div class="section">
+    <div class="section-title"><span>2.</span> System Architecture & Schema Design</div>
+    <p>The updated Express application communicates through Mongoose ODM to query the <code>tasks</code> collection in MongoDB:</p>
+    
+    <div class="diagram-box">
++--------------------+        +--------------------+        +------------------------+
+|    Express App     | ---->  |    Mongoose ODM    | ---->  |    MongoDB Database    |
+| (Routes/Controller)|        |  (Schema & Models) |        |  (studentportfolio DB) |
++--------------------+        +--------------------+        +------------------------+
+                                                                     |
+                                                                     v
+                                                            tasks collection
+                                                     { _id, title, description,
+                                                       completed, createdAt }
+    </div>
+
+    <h4 style="color: var(--accent); margin-top: 1rem;">Mongoose Task Schema Field Specifications:</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Field Name</th>
+          <th>Data Type</th>
+          <th>Validation / Rules</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>title</code></td>
+          <td>String</td>
+          <td><code>required: true</code>, <code>trim: true</code>, <code>maxlength: 100</code></td>
+          <td>Task title. Validation error returned if omitted or empty.</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td>String</td>
+          <td><code>trim: true</code>, <code>default: ""</code></td>
+          <td>Detailed task description text. Defaults to empty string.</td>
+        </tr>
+        <tr>
+          <td><code>completed</code></td>
+          <td>Boolean</td>
+          <td><code>default: false</code></td>
+          <td>Completion status flag. Defaults to false.</td>
+        </tr>
+        <tr>
+          <td><code>createdAt</code></td>
+          <td>Date</td>
+          <td><code>default: Date.now</code></td>
+          <td>Timestamp when document was generated. Auto-populated.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Implementation Code -->
+  <div class="section">
+    <div class="section-title"><span>3.</span> Code Implementation Highlights</div>
+
+    <p><strong>A) Database Connection Module (<code>backend/config/db.js</code>):</strong></p>
+    <div class="code-box">
+<span class="keyword">import</span> mongoose <span class="keyword">from</span> <span class="string">'mongoose'</span>;<br><br>
+<span class="keyword">const</span> connectDB = <span class="keyword">async</span> () =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">try</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> conn = <span class="keyword">await</span> mongoose.connect(process.env.MONGO_URI || <span class="string">'mongodb://127.0.0.1:27017/studentportfolio'</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;console.log(<span class="string">`🌿 MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`</span>);<br>
+&nbsp;&nbsp;} <span class="keyword">catch</span> (error) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;console.error(<span class="string">`❌ MongoDB Connection Error: ${error.message}`</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;process.exit(<span class="number">1</span>);<br>
+&nbsp;&nbsp;}<br>
+};<br>
+<span class="keyword">export default</span> connectDB;
+    </div>
+
+    <p><strong>B) Mongoose Schema & Model Definition (<code>backend/models/Task.js</code>):</strong></p>
+    <div class="code-box">
+<span class="keyword">import</span> mongoose <span class="keyword">from</span> <span class="string">'mongoose'</span>;<br><br>
+<span class="keyword">const</span> taskSchema = <span class="keyword">new</span> mongoose.Schema({<br>
+&nbsp;&nbsp;title: { type: String, required: [<span class="keyword">true</span>, <span class="string">'Task title is required'</span>], trim: <span class="keyword">true</span> },<br>
+&nbsp;&nbsp;description: { type: String, trim: <span class="keyword">true</span>, default: <span class="string">''</span> },<br>
+&nbsp;&nbsp;completed: { type: Boolean, default: <span class="keyword">false</span> },<br>
+&nbsp;&nbsp;createdAt: { type: Date, default: Date.now }<br>
+}, { versionKey: <span class="keyword">false</span> });<br><br>
+<span class="keyword">const</span> Task = mongoose.model(<span class="string">'Task'</span>, taskSchema);<br>
+<span class="keyword">export default</span> Task;
+    </div>
+
+    <p><strong>C) Custom Mongoose Error Handler Middleware (<code>backend/middleware/errorHandler.js</code>):</strong></p>
+    <div class="code-box">
+<span class="keyword">const</span> errorHandler = (err, req, res, next) =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">let</span> statusCode = res.statusCode && res.statusCode !== <span class="number">200</span> ? res.statusCode : <span class="number">500</span>;<br>
+&nbsp;&nbsp;<span class="keyword">let</span> errorMessage = err.message || <span class="string">'Internal Server Error'</span>;<br><br>
+&nbsp;&nbsp;<span class="comment">// 1. Handle Mongoose CastError (Invalid ObjectId)</span><br>
+&nbsp;&nbsp;<span class="keyword">if</span> (err.name === <span class="string">'CastError'</span>) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;statusCode = <span class="number">400</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;errorMessage = <span class="string">`Invalid resource ID format: '${err.value}' is not a valid MongoDB ObjectId`</span>;<br>
+&nbsp;&nbsp;}<br><br>
+&nbsp;&nbsp;<span class="comment">// 2. Handle Mongoose Schema ValidationError</span><br>
+&nbsp;&nbsp;<span class="keyword">if</span> (err.name === <span class="string">'ValidationError'</span>) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;statusCode = <span class="number">400</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> messages = Object.values(err.errors).map(val =&gt; val.message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;errorMessage = <span class="string">`Schema Validation Error: ${messages.join(', ')}`</span>;<br>
+&nbsp;&nbsp;}<br><br>
+&nbsp;&nbsp;res.status(statusCode).json({ success: <span class="keyword">false</span>, status: statusCode, error: errorMessage });<br>
+};<br>
+<span class="keyword">export default</span> errorHandler;
+    </div>
+  </div>
+
+  <!-- Verification & Results Table -->
+  <div class="section">
+    <div class="section-title"><span>4.</span> Endpoint Testing & Validation Results</div>
+    <p>All CRUD operations and Mongoose validation rules were verified via Thunder Client and the interactive web client:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Test Case</th>
+          <th>HTTP Method & Route</th>
+          <th>Input Payload / Parameters</th>
+          <th>Expected Status</th>
+          <th>Observed Response Behavior</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>GET All Tasks</strong></td>
+          <td><code>GET /tasks</code></td>
+          <td>None</td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Returns JSON array of documents retrieved via <code>Task.find()</code></td>
+        </tr>
+        <tr>
+          <td><strong>GET Task by ID</strong></td>
+          <td><code>GET /tasks/:id</code></td>
+          <td>Valid 24-char ObjectId</td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Returns matching document via <code>Task.findById(id)</code></td>
+        </tr>
+        <tr>
+          <td><strong>POST Create Task</strong></td>
+          <td><code>POST /tasks</code></td>
+          <td><code>{ title, description }</code></td>
+          <td><span class="status-badge badge-201">201 Created</span></td>
+          <td>Persists new document via <code>Task.create()</code></td>
+        </tr>
+        <tr>
+          <td><strong>Schema Validation Error</strong></td>
+          <td><code>POST /tasks</code></td>
+          <td><code>{ description: "No title" }</code></td>
+          <td><span class="status-badge badge-400">400 Bad Request</span></td>
+          <td>Caught by <code>ValidationError</code> handler: <em>"Task title is required"</em></td>
+        </tr>
+        <tr>
+          <td><strong>CastError (Invalid ID)</strong></td>
+          <td><code>GET /tasks/invalid-id</code></td>
+          <td>Malformed ID string</td>
+          <td><span class="status-badge badge-400">400 Bad Request</span></td>
+          <td>Caught by <code>CastError</code> handler: <em>"Invalid resource ID format"</em></td>
+        </tr>
+        <tr>
+          <td><strong>PUT Update Task</strong></td>
+          <td><code>PUT /tasks/:id</code></td>
+          <td><code>{ completed: true }</code></td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Updates database document via <code>Task.findByIdAndUpdate()</code></td>
+        </tr>
+        <tr>
+          <td><strong>DELETE Task</strong></td>
+          <td><code>DELETE /tasks/:id</code></td>
+          <td>Valid ObjectId</td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Removes document from MongoDB via <code>Task.findByIdAndDelete()</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Conclusion -->
+  <div class="section">
+    <div class="section-title"><span>5.</span> Conclusion & CO/PO Alignment</div>
+    <p>
+      Practical 5 successfully established a connection between the Express backend server and a local MongoDB instance using Mongoose. Data integrity is enforced at the database model level using schema validation rules. All async database operations, schema validation failures, and malformed ObjectIds are handled gracefully through custom middleware, returning structured JSON error messages.
+    </p>
+    <div class="info-box" style="margin-top: 1rem; border-left-color: var(--accent-green);">
+      <strong>Outcomes Achieved:</strong>
+      <ul>
+        <li><strong>CO2 / PO3:</strong> Designed and implemented a Mongoose Schema with field type constraints, required validators, and default values.</li>
+        <li><strong>CO3 / PO5:</strong> Built modular Express controllers using Mongoose Model API methods and structured error handling middleware for NoSQL database operations.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
