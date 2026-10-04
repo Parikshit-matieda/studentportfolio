@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 2 Report - Student Portfolio with React Router</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text-main: #c9d1d9;
+      --text-heading: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-green: #3fb950;
+      --code-bg: #011627;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      color: var(--text-heading);
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+    .meta-info {
+      display: flex;
+      gap: 2rem;
+      color: #8b949e;
+      font-weight: 500;
+    }
+    .meta-item strong {
+      color: var(--accent);
+    }
+    .step {
+      margin-bottom: 2.5rem;
+    }
+    .step-title {
+      font-size: 1.25rem;
+      color: var(--text-heading);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .step-title span {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: "Fira Code", Consolas, Monaco, "Courier New", monospace;
+      font-size: 0.9rem;
+      color: #d6deeb;
+      overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .code-box .keyword { color: #c792ea; }
+    .code-box .component { color: #ffcb8b; }
+    .code-box .string { color: #ecc48d; }
+    .code-box .comment { color: #637777; font-style: italic; }
+    .code-box .command { color: #addb67; }
+
+    .terminal-box {
+      background: #000;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      color: #ccc;
+    }
+    .prompt { color: #35b5ff; }
+    .success { color: var(--accent-green); }
+
+    .image-card {
+      margin-top: 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .image-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .image-caption {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: #8b949e;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Practical 2 Report: React Router & State Management</h1>
+      <div class="meta-info">
+        <div class="meta-item">Student: <strong>Parikshit Matieda</strong></div>
+        <div class="meta-item">ID: <strong>24IT049</strong></div>
+        <div class="meta-item">Project: <strong>Student Portfolio</strong></div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-title"><span>1.</span> Install React Router in the existing portfolio project:</div>
+      <div class="terminal-box">
+        <div><span class="prompt">PS C:\Users\parik\OneDrive\Desktop\Student-Portfolio></span> <span class="command">npm install react-router-dom</span></div>
+        <br>
+        <div class="success">added 4 packages, and audited 29 packages in 5s</div>
+        <br>
+        <div>10 packages are looking for funding</div>
+        <div>  run `npm fund` for details</div>
+        <br>
+        <div class="success">found 0 vulnerabilities</div>
+        <div><span class="prompt">PS C:\Users\parik\OneDrive\Desktop\Student-Portfolio></span></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-title"><span>2.</span> Wrap the App component with BrowserRouter in main.jsx:</div>
+      <div class="code-box">
+        <span class="keyword">import</span> { StrictMode } <span class="keyword">from</span> <span class="string">'react'</span><br>
+        <span class="keyword">import</span> { createRoot } <span class="keyword">from</span> <span class="string">'react-dom/client'</span><br>
+        <span class="keyword">import</span> { BrowserRouter } <span class="keyword">from</span> <span class="string">'react-router-dom'</span><br>
+        <span class="keyword">import</span> <span class="string">'./index.css'</span><br>
+        <span class="keyword">import</span> <span class="component">App</span> <span class="keyword">from</span> <span class="string">'./App.jsx'</span><br><br>
+        createRoot(document.getElementById(<span class="string">'root'</span>)).render(<br>
+        &nbsp;&nbsp;&lt;<span class="component">StrictMode</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">BrowserRouter</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">App</span> /&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="component">BrowserRouter</span>&gt;<br>
+        &nbsp;&nbsp;&lt;/<span class="component">StrictMode</span>&gt;,<br>
+        )
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-title"><span>3.</span> Define 3 routes inside App.jsx using Routes and Route:</div>
+      <div class="code-box">
+        <span class="keyword">return</span> (<br>
+        &nbsp;&nbsp;&lt;div className=<span class="string">"app"</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Header</span> theme={theme} toggleTheme={toggleTheme} /&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;main className=<span class="string">"main-content"</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Routes</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Route</span> path=<span class="string">"/"</span> element={&lt;<span class="component">Home</span> name={studentName} title={studentTitle} skills={skillsData} /&gt;} /&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Route</span> path=<span class="string">"/projects"</span> element={&lt;<span class="component">Projects</span> projects={projectsData} /&gt;} /&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Route</span> path=<span class="string">"/contact"</span> element={&lt;<span class="component">Contact</span> email={contactEmail} /&gt;} /&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="component">Routes</span>&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;/main&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="component">Footer</span> email={contactEmail} socialLinks={socialLinksData} /&gt;<br>
+        &nbsp;&nbsp;&lt;/div&gt;<br>
+        );
+      </div>
+    </div>
+
+    <!-- Step 4: useState Hooks Implementation -->
+    <div class="step">
+      <div class="step-title"><span>4.</span> Meaningful useState Hooks Implementation (Theme State & Form/UI Toggle):</div>
+      
+      <p style="color:#8b949e; margin-bottom: 0.5rem;"><strong>A) useState in App.jsx (Managing Theme & Scroll State):</strong></p>
+      <div class="code-box">
+        <span class="keyword">function</span> <span class="component">App</span>() {<br>
+        &nbsp;&nbsp;<span class="keyword">const</span> [theme, setTheme] = useState(() =&gt; {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> localStorage.getItem(<span class="string">"theme"</span>) || <span class="string">"light"</span>;<br>
+        &nbsp;&nbsp;});<br>
+        &nbsp;&nbsp;<span class="keyword">const</span> [scrollProgress, setScrollProgress] = useState(0);
+      </div>
+
+      <p style="color:#8b949e; margin-top: 1.25rem; margin-bottom: 0.5rem;"><strong>B) useState in Contact.jsx (1 for Form Input & 1 for UI Visibility Toggle):</strong></p>
+      <div class="code-box">
+        <span class="comment">// useState 1: Managing controlled form input (Message & Name)</span><br>
+        <span class="keyword">const</span> [name, setName] = useState(<span class="string">''</span>);<br>
+        <span class="keyword">const</span> [message, setMessage] = useState(<span class="string">''</span>);<br><br>
+        <span class="comment">// useState 2: Toggling UI visibility (Live Preview Box)</span><br>
+        <span class="keyword">const</span> [showPreview, setShowPreview] = useState(<span class="keyword">true</span>);
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-title"><span>5.</span> Screenshots of Output & Interactive Routes:</div>
+
+      <div class="image-card">
+        <img src="./screenshots/home_route_1784493530799.png" alt="Home Route">
+        <div class="image-caption">Figure 4.1: Home Route (Landing Page with Hero, About, and Skills)</div>
+      </div>
+
+      <div class="image-card">
+        <img src="./screenshots/projects_route_1784493543949.png" alt="Projects Route">
+        <div class="image-caption">Figure 4.2: Projects Route (Distinct Route Rendering Engineering Projects)</div>
+      </div>
+
+      <div class="image-card">
+        <img src="./screenshots/contact_route_preview_1784493576882.png" alt="Contact Route Real-time Preview">
+        <div class="image-caption">Figure 4.3: Contact Page with Controlled Input capturing and rendering user input in real time</div>
+      </div>
+
+      <div class="image-card">
+        <img src="./screenshots/contact_route_preview_hidden_1784493587770.png" alt="Contact Route UI Toggle">
+        <div class="image-caption">Figure 4.4: Contact Page showing UI Visibility Toggle (showPreview state hides/shows preview card)</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

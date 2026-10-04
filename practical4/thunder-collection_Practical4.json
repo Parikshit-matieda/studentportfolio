@@ -1,0 +1,124 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 4 - Express REST API",
+  "collectionId": "practical4-task-api",
+  "dateExported": "2026-10-04T12:15:00.000Z",
+  "version": "1.0",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "req-1",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "1. GET All Tasks",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-2",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "2. GET Task by ID (ID: 1)",
+      "url": "http://localhost:5000/tasks/1",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-3",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "3. POST Create Task",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implement JWT Authentication\",\n  \"description\": \"Add middleware to verify bearer tokens\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-4",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "4. PUT Update Task (ID: 1)",
+      "url": "http://localhost:5000/tasks/1",
+      "method": "PUT",
+      "sortNum": 40000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"completed\": true,\n  \"description\": \"Task updated via Thunder Client API request\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-5",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "5. DELETE Task (ID: 2)",
+      "url": "http://localhost:5000/tasks/2",
+      "method": "DELETE",
+      "sortNum": 50000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-6",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "6. GET 404 Test (Invalid Task ID)",
+      "url": "http://localhost:5000/tasks/999",
+      "method": "GET",
+      "sortNum": 60000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "req-7",
+      "colId": "practical4-task-api",
+      "containerId": "",
+      "name": "7. GET 500 Global Error Handler Test",
+      "url": "http://localhost:5000/error-test",
+      "method": "GET",
+      "sortNum": 70000,
+      "created": "2026-10-04T12:15:00.000Z",
+      "modified": "2026-10-04T12:15:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    }
+  ]
+}

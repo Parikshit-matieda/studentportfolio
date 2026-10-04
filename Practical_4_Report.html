@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 4 Report - Building a RESTful API with Node.js and Express</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text-main: #c9d1d9;
+      --text-heading: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-purple: #bc8cff;
+      --accent-amber: #d29922;
+      --accent-red: #f85149;
+      --code-bg: #011627;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .university-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .header h1 {
+      color: var(--text-heading);
+      margin: 0.25rem 0 0.5rem 0;
+      font-size: 1.8rem;
+    }
+    .meta-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: #8b949e;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    .meta-item strong {
+      color: var(--accent);
+    }
+    .badge {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      color: var(--text-heading);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+    .section-title span {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: "Fira Code", Consolas, Monaco, "Courier New", monospace;
+      font-size: 0.88rem;
+      color: #d6deeb;
+      overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      margin-bottom: 1rem;
+    }
+    .code-box .keyword { color: #c792ea; }
+    .code-box .function { color: #82aaff; }
+    .code-box .string { color: #ecc48d; }
+    .code-box .comment { color: #637777; font-style: italic; }
+    .code-box .status-200 { color: #3fb950; font-weight: bold; }
+    .code-box .status-201 { color: #3fb950; font-weight: bold; }
+    .code-box .status-404 { color: #d29922; font-weight: bold; }
+    .code-box .status-500 { color: #f85149; font-weight: bold; }
+
+    .terminal-box {
+      background: #000;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+    .prompt { color: #35b5ff; }
+    .success { color: var(--accent-green); }
+    .log-time { color: #8b949e; }
+    .log-method { color: var(--accent); font-weight: bold; }
+
+    /* Pipeline Architecture Box */
+    .arch-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      background: #011627;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    .arch-box strong { display: block; color: var(--text-heading); font-size: 0.9rem; }
+    .arch-box span { font-size: 0.75rem; color: #8b949e; }
+    .arrow-icon { color: var(--accent); font-weight: bold; }
+
+    /* Summary Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    th {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-heading);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="university-title">CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY • FTE</div>
+      <h1>Practical 4: Building a RESTful API with Node.js and Express</h1>
+      <div class="meta-info">
+        <div class="meta-item">Student: <strong>Parikshit Matieda</strong></div>
+        <div class="meta-item">ID: <strong>24IT049</strong></div>
+        <div class="meta-item">Course: <strong>Advanced Web Development Frameworks (ITUE301)</strong></div>
+        <div class="meta-item">CO/PO: <span class="badge">CO2 / PO3, PO5</span></div>
+      </div>
+    </div>
+
+    <!-- Objective & Prerequisites -->
+    <div class="section">
+      <div class="section-title"><span>1.</span> Objective & Problem Definition</div>
+      <p><strong>Objective:</strong> Design and implement a RESTful backend server with complete CRUD endpoints using Express middleware pipeline.</p>
+      <p><strong>Problem Statement:</strong> Build a Node/Express backend for a Task Management system. Implement REST endpoints for creating, reading, updating, and deleting tasks (using an in-memory array). Apply request logging middleware (method, URL, timestamp) and a global error handling middleware as the last step in the pipeline. Ensure appropriate HTTP status codes (200, 201, 400, 404, 500).</p>
+    </div>
+
+    <!-- Architecture -->
+    <div class="section">
+      <div class="section-title"><span>2.</span> Middleware Pipeline Architecture</div>
+      <div class="arch-container">
+        <div class="arch-flow">
+          <div class="arch-box" style="border-color: var(--accent);">
+            <strong>Client</strong>
+            <span>Postman / Browser / Curl</span>
+          </div>
+          <div class="arrow-icon">➔</div>
+          <div class="arch-box" style="border-color: var(--accent-amber);">
+            <strong>[Logging Middleware]</strong>
+            <span>Timestamp + Method + URL</span>
+          </div>
+          <div class="arrow-icon">➔</div>
+          <div class="arch-box" style="border-color: var(--accent-green);">
+            <strong>Express Router</strong>
+            <span>CRUD Handlers (/tasks)</span>
+          </div>
+          <div class="arrow-icon">➔</div>
+          <div class="arch-box" style="border-color: var(--accent-red);">
+            <strong>[Global Error Handler]</strong>
+            <span>500 Status JSON Response</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Implementation Details & Code -->
+    <div class="section">
+      <div class="section-title"><span>3.</span> Server & Middleware Code Implementation</div>
+
+      <p><strong>A) Request Logging Middleware (<code>practical4/middleware/logger.js</code>):</strong></p>
+      <div class="code-box">
+<span class="keyword">const</span> requestLogger = (req, res, next) =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">const</span> timestamp = <span class="keyword">new</span> Date().toISOString();<br>
+&nbsp;&nbsp;console.log(<span class="string">`[${timestamp}] ${req.method} ${req.originalUrl}`</span>);<br>
+&nbsp;&nbsp;next();<br>
+};<br>
+<span class="keyword">export default</span> requestLogger;
+      </div>
+
+      <p><strong>B) Global Error Handling Middleware (<code>practical4/middleware/errorHandler.js</code>):</strong></p>
+      <div class="code-box">
+<span class="keyword">const</span> errorHandler = (err, req, res, next) =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">const</span> statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;<br>
+&nbsp;&nbsp;console.error(<span class="string">`[GLOBAL ERROR HANDLER] ${err.message}`</span>);<br>
+&nbsp;&nbsp;res.status(statusCode).json({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;success: <span class="keyword">false</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;status: statusCode,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;error: err.message || <span class="string">'Internal Server Error'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;timestamp: <span class="keyword">new</span> Date().toISOString()<br>
+&nbsp;&nbsp;});<br>
+};<br>
+<span class="keyword">export default</span> errorHandler;
+      </div>
+
+      <p><strong>C) Express Server Assembly (<code>practical4/server.js</code>):</strong></p>
+      <div class="code-box">
+<span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">'express'</span>;<br>
+<span class="keyword">import</span> cors <span class="keyword">from</span> <span class="string">'cors'</span>;<br>
+<span class="keyword">import</span> requestLogger <span class="keyword">from</span> <span class="string">'./middleware/logger.js'</span>;<br>
+<span class="keyword">import</span> errorHandler <span class="keyword">from</span> <span class="string">'./middleware/errorHandler.js'</span>;<br>
+<span class="keyword">import</span> taskRoutes <span class="keyword">from</span> <span class="string">'./routes/taskRoutes.js'</span>;<br><br>
+<span class="keyword">const</span> app = express();<br>
+app.use(cors());<br>
+app.use(express.json());<br>
+app.use(requestLogger); <span class="comment">// 1. Custom Logging Middleware</span><br><br>
+app.use(<span class="string">'/tasks'</span>, taskRoutes); <span class="comment">// 2. Express Router</span><br><br>
+app.use(errorHandler); <span class="comment">// 3. Global Error Handler (Last in pipeline)</span>
+      </div>
+    </div>
+
+    <!-- REST API Endpoints Summary Table -->
+    <div class="section">
+      <div class="section-title"><span>4.</span> RESTful API Endpoint Summary</div>
+      <table>
+        <thead>
+          <tr>
+            <th>HTTP Method</th>
+            <th>Endpoint</th>
+            <th>Handler Function</th>
+            <th>Success Status</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--accent);">GET</strong></td>
+            <td><code>/tasks</code></td>
+            <td><code>getAllTasks</code></td>
+            <td><span class="status-200">200 OK</span></td>
+            <td>Retrieve list of all tasks</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent);">GET</strong></td>
+            <td><code>/tasks/:id</code></td>
+            <td><code>getTaskById</code></td>
+            <td><span class="status-200">200 OK</span> / <span class="status-404">404</span></td>
+            <td>Retrieve single task by ID</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent-green);">POST</strong></td>
+            <td><code>/tasks</code></td>
+            <td><code>createTask</code></td>
+            <td><span class="status-201">201 Created</span></td>
+            <td>Create a new task with JSON body</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent-amber);">PUT</strong></td>
+            <td><code>/tasks/:id</code></td>
+            <td><code>updateTask</code></td>
+            <td><span class="status-200">200 OK</span> / <span class="status-404">404</span></td>
+            <td>Update existing task by ID</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent-red);">DELETE</strong></td>
+            <td><code>/tasks/:id</code></td>
+            <td><code>deleteTask</code></td>
+            <td><span class="status-200">200 OK</span> / <span class="status-404">404</span></td>
+            <td>Delete a task by ID</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent-purple);">GET</strong></td>
+            <td><code>/error-test</code></td>
+            <td><code>Simulated Error</code></td>
+            <td><span class="status-500">500 Server Error</span></td>
+            <td>Test Global Error Handler pipeline</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Verification Log Output -->
+    <div class="section">
+      <div class="section-title"><span>5.</span> Server Execution & Request Logging Terminal Output</div>
+      <div class="terminal-box">
+        <div><span class="prompt">PS C:\Users\parik\OneDrive\Desktop\Student-Portfolio></span> <span class="command">npm run server</span></div>
+        <br>
+        <div class="success">🚀 CHARUSAT AWD Practical 4 - Task REST API Server Running</div>
+        <div class="success">📍 Base URL: http://localhost:5000</div>
+        <div>====================================================================</div>
+        <div><span class="log-time">[2026-10-04T11:58:01.921Z]</span> <span class="log-method">GET</span> /tasks</div>
+        <div><span class="log-time">[2026-10-04T11:59:45.548Z]</span> <span class="log-method">PUT</span> /tasks/1</div>
+        <div><span class="log-time">[2026-10-04T11:59:45.624Z]</span> <span class="log-method">DELETE</span> /tasks/2</div>
+        <div><span class="log-time">[2026-10-04T11:59:45.673Z]</span> <span class="log-method">GET</span> /tasks/999</div>
+        <div><span class="log-time">[2026-10-04T11:59:45.734Z]</span> <span class="log-method">GET</span> /error-test</div>
+        <div style="color: var(--accent-red);">[GLOBAL ERROR HANDLER] Simulated Uncaught Exception for testing Global Error Handler pipeline</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
