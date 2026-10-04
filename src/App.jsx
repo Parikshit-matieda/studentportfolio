@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './components/Home';
 import Projects from './components/Projects';
+import Tasks from './components/Tasks';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import PostgresLogo from './components/PostgresLogo';
@@ -244,6 +245,10 @@ function App() {
             <Route 
               path="/projects" 
               element={<Projects projects={projectsData} />} 
+            />
+            <Route 
+              path="/tasks" 
+              element={<Tasks />} 
             />
             <Route 
               path="/contact" 

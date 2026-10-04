@@ -16,6 +16,9 @@ function Header({ name, theme, toggleTheme }) {
           <NavLink to="/projects" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Projects
           </NavLink>
+          <NavLink to="/tasks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Tasks (Full Stack)
+          </NavLink>
           <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Contact
           </NavLink>
