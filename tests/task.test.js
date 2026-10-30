@@ -2,6 +2,7 @@ import { test, describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import cache, { invalidateTasksCache } from '../backend/config/cache.js';
 import taskEmitter from '../backend/events/taskEmitter.js';
+import { enhanceTaskWithAI, getAiServiceHealth } from '../backend/services/aiService.js';
 
 /**
  * Automated Test Suite for Practical 12: CI/CD Pipeline with GitHub Actions
@@ -82,3 +83,31 @@ describe('3. Validation & Business Logic Tests', () => {
     }
   });
 });
+
+describe('4. AI API Integration & Graceful Degradation (Practical 13)', () => {
+  it('should return operational health telemetry for AI service', async () => {
+    const health = await getAiServiceHealth();
+    assert.strictEqual(health.status, 'operational');
+    assert.strictEqual(health.gracefulDegradationActive, true);
+    assert.ok(Array.isArray(health.supportedFeatures));
+  });
+
+  it('should enhance a task using AI service or fallback', async () => {
+    const enhanced = await enhanceTaskWithAI('Deploy Multi-Stage Docker Container to AWS');
+    assert.ok(enhanced.description, 'Description should be generated');
+    assert.ok(['low', 'medium', 'high', 'urgent'].includes(enhanced.priority), 'Valid priority expected');
+    assert.ok(typeof enhanced.estimatedHours === 'number', 'Estimated hours should be numeric');
+    assert.ok(Array.isArray(enhanced.subtasks), 'Subtasks should be an array');
+    assert.strictEqual(enhanced.aiGenerated, true);
+  });
+
+  it('should gracefully degrade when external AI service errors or offline', async () => {
+    const degraded = await enhanceTaskWithAI('Fix Critical Authentication Crash', '', { forceDegradation: true });
+    assert.strictEqual(degraded.degraded, true, 'Degraded flag should be true');
+    assert.strictEqual(degraded.source, 'fallback-heuristic-engine');
+    assert.strictEqual(degraded.priority, 'high');
+    assert.ok(degraded.description.length > 20);
+    assert.ok(degraded.apiDiagnostics, 'Diagnostics object should be present');
+  });
+});
+

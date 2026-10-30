@@ -12,6 +12,10 @@ import taskEmitter, {
   getNotificationLogs,
   clearNotificationLogs
 } from '../events/taskEmitter.js';
+import {
+  enhanceTaskWithAI,
+  getAiServiceHealth
+} from '../services/aiService.js';
 
 /**
  * Practicals 9 & 10: In-Memory Caching & Asynchronous Event-Driven Architecture
@@ -176,14 +180,39 @@ export const createTask = async (req, res, next) => {
   const apiEmittedAt = new Date().toISOString();
 
   try {
-    const { title, description, completed, priority } = req.body;
+    let { title, description, completed, priority, estimatedHours, suggestedDeadline, subtasks, autoEnhance } = req.body;
     const isSyncMode = req.query.sync === 'true'; // Comparison toggle for Practical 10
+    const shouldDegrade = req.query.degrade === 'true';
+
+    let aiGenerated = false;
+    let aiSource = null;
+
+    // Practical 13: Optional auto-enhancement during task creation
+    if (autoEnhance || req.query.ai === 'true') {
+      try {
+        const aiResult = await enhanceTaskWithAI(title, description, { forceDegradation: shouldDegrade });
+        description = description || aiResult.description;
+        priority = priority || aiResult.priority;
+        estimatedHours = estimatedHours || aiResult.estimatedHours;
+        suggestedDeadline = suggestedDeadline || aiResult.suggestedDeadline;
+        subtasks = (subtasks && subtasks.length > 0) ? subtasks : aiResult.subtasks;
+        aiGenerated = true;
+        aiSource = aiResult.source;
+      } catch (aiErr) {
+        console.warn(`[AI Enhancement Degraded] ${aiErr.message}`);
+      }
+    }
 
     const newTask = await Task.create({
       title,
       description: description || '',
       completed: completed !== undefined ? completed : false,
       priority: priority || 'medium',
+      estimatedHours: estimatedHours || 2,
+      suggestedDeadline: suggestedDeadline || null,
+      subtasks: subtasks || [],
+      aiGenerated,
+      aiSource,
       user: req.user._id
     });
 
@@ -385,3 +414,45 @@ export const clearNotificationsHandler = (req, res) => {
     message: `Notification log purged. Cleared ${clearedCount} notification record(s).`
   });
 };
+
+// Practical 13: POST /tasks/ai/enhance - AI-powered task enhancement endpoint
+export const aiEnhanceHandler = async (req, res, next) => {
+  try {
+    const { title, description } = req.body;
+    const forceDegradation = req.query.degrade === 'true' || req.body.forceDegradation === true;
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        error: 'Task title is required for AI enhancement'
+      });
+    }
+
+    const enhanced = await enhanceTaskWithAI(title, description, { forceDegradation });
+
+    return res.status(200).json({
+      success: true,
+      message: enhanced.degraded
+        ? 'Task enhanced via AI Service (Gracefully Degraded Fallback Mode)'
+        : 'Task enhanced via Live AI Service',
+      data: enhanced
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Practical 13: GET /tasks/ai/health - AI Service diagnostic health check
+export const aiHealthHandler = async (req, res, next) => {
+  try {
+    const health = await getAiServiceHealth();
+    return res.status(200).json({
+      success: true,
+      message: 'Practical 13: AI Service Integration Telemetry & Health',
+      health
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

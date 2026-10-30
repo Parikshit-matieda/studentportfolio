@@ -1,0 +1,133 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 13 - AI API Integration with Graceful Degradation",
+  "collectionId": "practical13-ai-integration",
+  "dateExported": "2026-10-30T17:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    {
+      "_id": "folder-p13-auth",
+      "name": "0. Authentication (Token Setup)",
+      "containerId": "",
+      "created": "2026-10-30T17:00:00.000Z",
+      "sortNum": 5000
+    },
+    {
+      "_id": "folder-p13-ai-live",
+      "name": "1. Live AI Enhancement & Priority Prediction",
+      "containerId": "",
+      "created": "2026-10-30T17:00:00.000Z",
+      "sortNum": 10000
+    },
+    {
+      "_id": "folder-p13-ai-degraded",
+      "name": "2. Responsible AI Graceful Degradation (Fallback)",
+      "containerId": "",
+      "created": "2026-10-30T17:00:00.000Z",
+      "sortNum": 20000
+    },
+    {
+      "_id": "folder-p13-ai-crud",
+      "name": "3. End-to-End AI Task Creation & Health",
+      "containerId": "",
+      "created": "2026-10-30T17:00:00.000Z",
+      "sortNum": 30000
+    }
+  ],
+  "requests": [
+    {
+      "_id": "req-p13-0",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-auth",
+      "name": "0. POST Login (Get Bearer Token)",
+      "url": "http://localhost:5000/auth/login",
+      "method": "POST",
+      "sortNum": 5000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@charusat.edu.in\",\n  \"password\": \"password123\"\n}"
+      }
+    },
+    {
+      "_id": "req-p13-1",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-ai-live",
+      "name": "1. POST /tasks/ai/enhance (Live AI Task Generation)",
+      "url": "http://localhost:5000/tasks/ai/enhance",
+      "method": "POST",
+      "sortNum": 10000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Optimize MongoDB Aggregation Pipeline\"\n}"
+      }
+    },
+    {
+      "_id": "req-p13-2",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-ai-live",
+      "name": "2. POST /tasks/ai/enhance (DevOps Task Auto-Prioritize)",
+      "url": "http://localhost:5000/tasks/ai/enhance",
+      "method": "POST",
+      "sortNum": 15000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Deploy Multi-Stage Docker Container to AWS ECS\"\n}"
+      }
+    },
+    {
+      "_id": "req-p13-3",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-ai-degraded",
+      "name": "3. POST /tasks/ai/enhance?degrade=true (Demonstrate Graceful Fallback)",
+      "url": "http://localhost:5000/tasks/ai/enhance?degrade=true",
+      "method": "POST",
+      "sortNum": 20000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Fix Security Vulnerability in JWT Token Validation\"\n}"
+      }
+    },
+    {
+      "_id": "req-p13-4",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-ai-crud",
+      "name": "4. POST /tasks?ai=true (Create Task with AI Auto-Fill)",
+      "url": "http://localhost:5000/tasks?ai=true",
+      "method": "POST",
+      "sortNum": 30000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Setup Automated GitHub Actions CI/CD Quality Pipeline\",\n  \"autoEnhance\": true\n}"
+      }
+    },
+    {
+      "_id": "req-p13-5",
+      "colId": "practical13-ai-integration",
+      "containerId": "folder-p13-ai-crud",
+      "name": "5. GET /ai/health (AI Service Telemetry & Diagnostics)",
+      "url": "http://localhost:5000/ai/health",
+      "method": "GET",
+      "sortNum": 35000,
+      "headers": []
+    }
+  ]
+}

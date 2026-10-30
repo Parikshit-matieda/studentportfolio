@@ -8,7 +8,9 @@ import {
   getCacheStats,
   clearCacheHandler,
   getNotificationsHandler,
-  clearNotificationsHandler
+  clearNotificationsHandler,
+  aiEnhanceHandler,
+  aiHealthHandler
 } from '../controllers/taskController.js';
 import { protect } from '../middleware/auth.js';
 import { validateTaskInput, validateObjectId } from '../middleware/validation.js';
@@ -18,13 +20,18 @@ const router = express.Router();
 // Protect ALL task routes with JWT authentication middleware
 router.use(protect);
 
-// 1. In-Memory Cache Debug & Telemetry Endpoints (Practical 9)
+// 1. Practical 13: AI Service Integration Endpoints
+// Placed BEFORE /:id route so 'ai' is not parsed as an ObjectId parameter
+router.post('/ai/enhance', aiEnhanceHandler);
+router.get('/ai/health', aiHealthHandler);
+
+// 2. In-Memory Cache Debug & Telemetry Endpoints (Practical 9)
 // Placed BEFORE /:id route so 'cache' is not parsed as an ObjectId parameter
 router.get('/cache/stats', getCacheStats);
 router.delete('/cache/flush', clearCacheHandler);
 router.post('/cache/flush', clearCacheHandler);
 
-// 2. Practical 10: Asynchronous Notification Audit Log Endpoints
+// 3. Practical 10: Asynchronous Notification Audit Log Endpoints
 // Placed BEFORE /:id route so 'notifications' is not parsed as an ObjectId parameter
 router.get('/notifications', getNotificationsHandler);
 router.delete('/notifications', clearNotificationsHandler);

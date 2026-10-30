@@ -104,6 +104,18 @@ app.get('/notifications', (req, res) => {
   });
 });
 
+import { getAiServiceHealth } from './services/aiService.js';
+
+// Public AI Integration Telemetry & Health Endpoint (Practical 13)
+app.get('/ai/health', async (req, res) => {
+  const health = await getAiServiceHealth();
+  res.status(200).json({
+    success: true,
+    message: 'Practical 13: AI Service Integration Telemetry & Health',
+    health
+  });
+});
+
 // 4. Mount Express Router for Task REST API (Protected by auth & validation pipeline)
 app.use('/tasks', taskRoutes);
 

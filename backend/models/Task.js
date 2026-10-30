@@ -19,8 +19,27 @@ const taskSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ['low', 'medium', 'high'],
+      enum: ['low', 'medium', 'high', 'urgent'],
       default: 'medium'
+    },
+    estimatedHours: {
+      type: Number,
+      default: 2
+    },
+    suggestedDeadline: {
+      type: Date
+    },
+    subtasks: {
+      type: [String],
+      default: []
+    },
+    aiGenerated: {
+      type: Boolean,
+      default: false
+    },
+    aiSource: {
+      type: String,
+      default: null
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
