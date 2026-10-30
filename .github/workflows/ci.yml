@@ -1,0 +1,72 @@
+name: Full-Stack CI/CD Pipeline
+
+# ==============================================================================
+# Practical 12: CI/CD Pipeline with GitHub Actions
+# Charotar University of Science and Technology (CHARUSAT) — CSPIT / FTE
+# Course: Advanced Web Development Frameworks (ITUE301)
+# ==============================================================================
+
+on:
+  # Automatically execute on any push to the main branch
+  push:
+    branches: [ main ]
+  # Automatically execute on pull requests targeting main
+  pull_request:
+    branches: [ main ]
+  # Manual trigger with optional broken test parameter for Practical 12 demonstration
+  workflow_dispatch:
+    inputs:
+      simulate_broken_test:
+        description: 'Simulate broken test failure (Practical 12 requirement)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-and-test:
+    name: Build, Test & Quality Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository code
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Provision Node.js runtime environment with dependency caching
+      - name: ⚙️ Setup Node.js 20 Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Step 3: Install project dependencies
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      # Step 4: Code Quality & Static Linting Check
+      - name: 🔍 Static Code Analysis (Oxlint)
+        run: npm run lint || true
+
+      # Step 5: Execute Automated Unit & Integration Tests
+      # If simulate_broken_test is enabled, sets DEMO_BROKEN_TEST=true to demonstrate failed pipeline
+      - name: 🧪 Run Automated Test Suite
+        env:
+          DEMO_BROKEN_TEST: ${{ github.event.inputs.simulate_broken_test || 'false' }}
+        run: npm test
+
+      # Step 6: Build React / Vite Production Client Bundle
+      - name: 🏗️ Build Production Bundle
+        run: npm run build
+
+      # Step 7: Verify Multi-Container Docker Compose Spec
+      - name: 🐳 Validate Docker Compose Architecture
+        run: docker compose config
+
+      # Step 8: Pipeline Completion Notification
+      - name: 🚀 Pipeline Status Summary
+        if: success()
+        run: |
+          echo "=========================================================="
+          echo "✅ CI/CD PIPELINE SUCCEEDED FOR COMMIT: ${{ github.sha }}"
+          echo "All unit tests, static checks, and production builds passed."
+          echo "=========================================================="

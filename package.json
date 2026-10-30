@@ -9,6 +9,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "test": "node --test tests/**/*.test.js",
+    "test:broken": "node tests/simulate-failure.js",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
