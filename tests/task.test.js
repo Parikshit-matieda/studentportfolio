@@ -33,23 +33,25 @@ describe('1. In-Memory Caching Unit Tests (Practical 9 Engine)', () => {
 });
 
 describe('2. Event-Driven Architecture Unit Tests (Practical 10 EventEmitter)', () => {
-  it('should emit and listen for task:created events asynchronously', (t, done) => {
+  it('should emit and listen for task:created events asynchronously', async () => {
     const dummyTask = { _id: 'test_task_id_99', title: 'CI/CD Automated Test Task' };
     const dummyUser = { name: 'CI/CD Bot', email: 'ci@charusat.edu.in' };
 
-    const testListener = (payload) => {
-      try {
-        assert.strictEqual(payload.task.title, 'CI/CD Automated Test Task');
-        assert.strictEqual(payload.user.email, 'ci@charusat.edu.in');
-        taskEmitter.removeListener('task:created', testListener);
-        done();
-      } catch (err) {
-        done(err);
-      }
-    };
+    await new Promise((resolve, reject) => {
+      const testListener = (payload) => {
+        try {
+          assert.strictEqual(payload.task.title, 'CI/CD Automated Test Task');
+          assert.strictEqual(payload.user.email, 'ci@charusat.edu.in');
+          taskEmitter.removeListener('task:created', testListener);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
 
-    taskEmitter.on('task:created', testListener);
-    taskEmitter.emit('task:created', { task: dummyTask, user: dummyUser, emittedAt: new Date().toISOString() });
+      taskEmitter.on('task:created', testListener);
+      taskEmitter.emit('task:created', { task: dummyTask, user: dummyUser, emittedAt: new Date().toISOString() });
+    });
   });
 });
 

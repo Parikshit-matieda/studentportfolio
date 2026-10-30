@@ -48,11 +48,15 @@ jobs:
         run: npm run lint || true
 
       # Step 5: Execute Automated Unit & Integration Tests
-      # If simulate_broken_test is enabled, sets DEMO_BROKEN_TEST=true to demonstrate failed pipeline
+      # If simulate_broken_test is enabled via workflow_dispatch, executes broken test suite
       - name: 🧪 Run Automated Test Suite
-        env:
-          DEMO_BROKEN_TEST: ${{ github.event.inputs.simulate_broken_test || 'false' }}
-        run: npm test
+        run: |
+          if [ "${{ inputs.simulate_broken_test }}" = "true" ]; then
+            echo "🚨 Demonstrating broken test pipeline failure for Practical 12..."
+            npm run test:broken
+          else
+            npm test
+          fi
 
       # Step 6: Build React / Vite Production Client Bundle
       - name: 🏗️ Build Production Bundle
