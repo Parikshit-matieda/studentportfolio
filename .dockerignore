@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.git
+.github
+.env
+.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+screenshots
+*.png
+*.docx
+.oxlintrc.json
+.vscode
+.idea

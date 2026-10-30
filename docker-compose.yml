@@ -1,0 +1,82 @@
+# ==============================================================================
+# Multi-Container Orchestration with Docker Compose
+# Practical 11: Containerization with Docker and Docker Compose
+# Charotar University of Science and Technology (CHARUSAT) — CSPIT / FTE
+# Orchestrates: React Frontend + Express Backend + MongoDB Database
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Service 1: MongoDB Database Container
+  # ----------------------------------------------------------------------------
+  mongo:
+    image: mongo:7.0
+    container_name: task_mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017" # Exposed to host on 27018 to avoid conflict with local MongoDB 27017
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ----------------------------------------------------------------------------
+  # Service 2: Node.js / Express Backend API Container
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: task_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/studentportfolio
+      - JWT_SECRET=charusat_itue301_practical11_jwt_secret_key_2026
+      - JWT_EXPIRES_IN=1h
+      - NODE_ENV=production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ----------------------------------------------------------------------------
+  # Service 3: React (Vite) Frontend + Nginx Web Server Container
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+# ------------------------------------------------------------------------------
+# Persistent Volume Definitions (Guarantees data retention across container restarts)
+# ------------------------------------------------------------------------------
+volumes:
+  mongo-data:
+    name: studentportfolio_mongo_data
+
+# ------------------------------------------------------------------------------
+# Isolated Bridge Network (Enables internal DNS resolution between containers)
+# ------------------------------------------------------------------------------
+networks:
+  app-network:
+    name: studentportfolio_network
+    driver: bridge
