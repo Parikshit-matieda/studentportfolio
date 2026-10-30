@@ -82,12 +82,25 @@ import { getCacheTelemetry } from './config/cache.js';
 // Also mount at root for direct /register, /login, /me support as specified in lab prompt
 app.use('/', authRoutes);
 
-// Public Cache Telemetry Endpoint (Supplementary Problem 2)
+import { getNotificationLogs } from './events/taskEmitter.js';
+
+// Public Cache Telemetry Endpoint (Practical 9)
 app.get('/cache/stats', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Practical 9: In-Memory Cache Telemetry (node-cache)',
     telemetry: getCacheTelemetry()
+  });
+});
+
+// Public Notification Audit Log Endpoint (Practical 10)
+app.get('/notifications', (req, res) => {
+  const logs = getNotificationLogs();
+  res.status(200).json({
+    success: true,
+    message: 'Practical 10: Asynchronous Notification Audit Log (EventEmitter)',
+    count: logs.length,
+    notifications: logs
   });
 });
 
@@ -115,21 +128,23 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`====================================================================`);
-  console.log(`🚀 Task Management API Running (Practical 9 - In-Memory Caching & Optimization)`);
+  console.log(`🚀 Task Management API Running (Practical 10 - Asynchronous EventEmitter EDA)`);
   console.log(`📍 Base URL: http://localhost:${PORT}`);
-  console.log(`📌 Public Auth Endpoints:`);
+  console.log(`📌 Public Endpoints:`);
   console.log(`   - POST   /auth/register (or /register) - Register user + hash bcrypt password`);
   console.log(`   - POST   /auth/login    (or /login)    - Verify bcrypt + generate JWT token`);
-  console.log(`   - GET    /cache/stats                  - View in-memory cache telemetry & hit/miss stats`);
+  console.log(`   - GET    /cache/stats                  - View in-memory cache telemetry`);
+  console.log(`   - GET    /notifications                - View background notification event logs`);
   console.log(`📌 Protected Endpoints (Requires Authorization: Bearer <token>):`);
   console.log(`   - GET    /auth/me                      - Return current user from decoded JWT`);
-  console.log(`   - GET    /tasks                        - Fetch all tasks (Cached with node-cache, 60s TTL)`);
-  console.log(`   - GET    /tasks/:id                    - Fetch single task (Cached separately)`);
-  console.log(`   - POST   /tasks                        - Create task (Invalidates cache on write)`);
-  console.log(`   - PUT    /tasks/:id                    - Update task (Invalidates cache on write)`);
-  console.log(`   - DELETE /tasks/:id                    - Delete task (Invalidates cache on write)`);
+  console.log(`   - GET    /tasks                        - Fetch all tasks (Cached with node-cache)`);
+  console.log(`   - GET    /tasks/:id                    - Fetch single task`);
+  console.log(`   - POST   /tasks                        - Create task (Emits async 'task:created')`);
+  console.log(`   - POST   /tasks?sync=true              - Create task (Sync comparison mode)`);
+  console.log(`   - PUT    /tasks/:id                    - Update task (Emits async 'task:updated')`);
+  console.log(`   - DELETE /tasks/:id                    - Delete task (Emits async 'task:deleted')`);
+  console.log(`   - GET    /tasks/notifications          - Protected background notification history`);
   console.log(`   - GET    /tasks/cache/stats            - Detailed cache telemetry debug endpoint`);
-  console.log(`   - POST   /tasks/cache/flush            - Manually flush and reset cache`);
   console.log(`====================================================================`);
 });
 

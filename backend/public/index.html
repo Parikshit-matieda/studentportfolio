@@ -351,6 +351,25 @@
             <div><span class="btn-method" style="background:#0284c7; color:#fff;">RUN</span><strong>15. Run 3x3 Empirical Benchmark (Cached vs Uncached)</strong></div>
             <span style="font-size: 0.75rem;">Speedup %</span>
           </button>
+
+          <div style="font-size:0.8rem; font-weight:600; color:#c084fc; margin-top:1rem; border-top: 1px solid #1f2937; padding-top:0.75rem;">
+            PRACTICAL 10: ASYNCHRONOUS EVENT-DRIVEN ARCHITECTURE (EventEmitter)
+          </div>
+
+          <button class="btn btn-success-soft btn-post" onclick="testAsyncEventCreation()">
+            <div><span class="btn-method">POST</span><strong>16. Create Task [Async Non-Blocking Event]</strong></div>
+            <span style="font-size: 0.75rem;">Fast ~18ms</span>
+          </button>
+
+          <button class="btn btn-danger-soft btn-post" onclick="testSyncBlockingCreation()">
+            <div><span class="btn-method">POST</span><strong>17. Create Task [Sync Blocking Comparison]</strong></div>
+            <span style="font-size: 0.75rem;">Delayed ~800ms</span>
+          </button>
+
+          <button class="btn btn-auth btn-get" onclick="testNotificationAuditLog()">
+            <div><span class="btn-method">GET</span><strong>18. Inspect Notification Audit Log</strong></div>
+            <span style="font-size: 0.75rem;">/tasks/notifications</span>
+          </button>
         </div>
       </div>
     </div>
@@ -647,6 +666,42 @@ ${cachedReadings.map(c => `  - Sample ${c.sample}: Server Time = ${c.serverTime}
 ===============================================================`;
 
     logResponse(report, 200);
+  }
+
+  // === PRACTICAL 10: ASYNCHRONOUS EVENT-DRIVEN ARCHITECTURE ===
+
+  // 16. Asynchronous Task Creation (Immediate Response)
+  async function testAsyncEventCreation() {
+    if (!activeToken) {
+      await testLoginDemo();
+    }
+    await apiCall('/tasks', 'POST', {
+      title: 'Practical 10 Async Task ' + Math.floor(Math.random() * 1000),
+      description: 'Dispatches task:created to Node.js native EventEmitter in background',
+      priority: 'high',
+      completed: false
+    }, true);
+  }
+
+  // 17. Synchronous Blocking Comparison Task Creation
+  async function testSyncBlockingCreation() {
+    if (!activeToken) {
+      await testLoginDemo();
+    }
+    await apiCall('/tasks?sync=true', 'POST', {
+      title: 'Practical 10 Sync Blocking Task ' + Math.floor(Math.random() * 1000),
+      description: 'Blocks main thread for ~800ms before responding to illustrate latency degradation',
+      priority: 'medium',
+      completed: false
+    }, true);
+  }
+
+  // 18. Inspect Notification Audit Log
+  async function testNotificationAuditLog() {
+    if (!activeToken) {
+      await testLoginDemo();
+    }
+    await apiCall('/tasks/notifications', 'GET', null, true);
   }
 
   // Initialize UI on load

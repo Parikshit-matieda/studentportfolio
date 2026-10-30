@@ -7,10 +7,15 @@ import cache, {
   getCacheTelemetry,
   flushCache
 } from '../config/cache.js';
+import taskEmitter, {
+  processNotificationSync,
+  getNotificationLogs,
+  clearNotificationLogs
+} from '../events/taskEmitter.js';
 
 /**
- * Practical 9: In-Memory Caching and Query Optimization Controller
- * Handles RESTful Task operations with node-cache caching layer
+ * Practicals 9 & 10: In-Memory Caching & Asynchronous Event-Driven Architecture
+ * Handles RESTful Task operations, node-cache layer, and native EventEmitter background jobs
  */
 
 // GET /tasks - Fetch tasks from In-Memory Cache or MongoDB
@@ -165,10 +170,14 @@ export const getTaskById = async (req, res, next) => {
   }
 };
 
-// POST /tasks - Create a new task and INVALIDATE task cache
+// POST /tasks - Create a new task, INVALIDATE cache, and EMIT 'task:created' event (Practical 10)
 export const createTask = async (req, res, next) => {
+  const reqStartTime = process.hrtime.bigint();
+  const apiEmittedAt = new Date().toISOString();
+
   try {
     const { title, description, completed, priority } = req.body;
+    const isSyncMode = req.query.sync === 'true'; // Comparison toggle for Practical 10
 
     const newTask = await Task.create({
       title,
@@ -178,22 +187,66 @@ export const createTask = async (req, res, next) => {
       user: req.user._id
     });
 
-    // Invalidate Cache after successful write to ensure data freshness
+    // Invalidate Cache after successful write to ensure data freshness (Practical 9)
     const invalidatedKeys = invalidateTasksCache();
 
+    // PRACTICAL 10: Event-Driven Asynchronous Processing vs Synchronous Blocking
+    if (isSyncMode) {
+      // Synchronous comparison: API is forced to wait for notification handler
+      const syncResult = await processNotificationSync(newTask, req.user, apiEmittedAt);
+      const reqEndTime = process.hrtime.bigint();
+      const totalDurationMs = (Number(reqEndTime - reqStartTime) / 1e6).toFixed(2);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Task created (SYNCHRONOUS BLOCKING MODE)',
+        data: newTask,
+        cacheInvalidated: true,
+        executionMode: 'synchronous-blocking',
+        notificationStatus: 'processed-inline',
+        timestamps: {
+          requestReceivedAt: apiEmittedAt,
+          apiResponseSentAt: syncResult.syncCompletedAt,
+          blockingDelay: `${syncResult.durationMs} ms`,
+          totalApiDuration: `${totalDurationMs} ms`
+        },
+        observation: '⚠️ Main API thread was blocked while processing notifications synchronously.'
+      });
+    }
+
+    // Default: Asynchronous Non-Blocking Event-Driven Processing
+    // Native EventEmitter emits 'task:created' immediately into the event loop
+    taskEmitter.emit('task:created', {
+      task: newTask,
+      user: req.user,
+      emittedAt: apiEmittedAt
+    });
+
+    const reqEndTime = process.hrtime.bigint();
+    const totalDurationMs = (Number(reqEndTime - reqStartTime) / 1e6).toFixed(2);
+
+    // API Response returns IMMEDIATELY without waiting for background event listener
     res.status(201).json({
       success: true,
-      message: 'Task created successfully and cache invalidated',
+      message: 'Task created successfully and background notification emitted',
       data: newTask,
       cacheInvalidated: true,
-      invalidatedKeysCount: invalidatedKeys.length
+      invalidatedKeysCount: invalidatedKeys.length,
+      executionMode: 'asynchronous-non-blocking',
+      notificationStatus: 'emitted-to-event-loop',
+      timestamps: {
+        apiEmittedAt: apiEmittedAt,
+        apiResponseSentAt: new Date().toISOString(),
+        totalApiDuration: `${totalDurationMs} ms`
+      },
+      observation: '⚡ API responded immediately; background notification handler runs concurrently without delaying response.'
     });
   } catch (error) {
     next(error);
   }
 };
 
-// PUT /tasks/:id - Update an existing task document and INVALIDATE cache
+// PUT /tasks/:id - Update task, INVALIDATE cache, and EMIT 'task:updated'
 export const updateTask = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -227,19 +280,27 @@ export const updateTask = async (req, res, next) => {
     // Invalidate Cache (both all_tasks and single task key)
     const invalidatedKeys = invalidateTasksCache(req.params.id);
 
+    // Practical 10: Emit update event
+    taskEmitter.emit('task:updated', {
+      task: updatedTask,
+      user: req.user,
+      emittedAt: new Date().toISOString()
+    });
+
     res.status(200).json({
       success: true,
       message: `Task ${req.params.id} updated successfully and cache invalidated`,
       data: updatedTask,
       cacheInvalidated: true,
-      invalidatedKeysCount: invalidatedKeys.length
+      invalidatedKeysCount: invalidatedKeys.length,
+      eventEmitted: 'task:updated'
     });
   } catch (error) {
     next(error);
   }
 };
 
-// DELETE /tasks/:id - Delete a task document and INVALIDATE cache
+// DELETE /tasks/:id - Delete task, INVALIDATE cache, and EMIT 'task:deleted'
 export const deleteTask = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -266,19 +327,27 @@ export const deleteTask = async (req, res, next) => {
     // Invalidate Cache (both all_tasks and single task key)
     const invalidatedKeys = invalidateTasksCache(req.params.id);
 
+    // Practical 10: Emit delete event
+    taskEmitter.emit('task:deleted', {
+      task: deletedTask,
+      user: req.user,
+      emittedAt: new Date().toISOString()
+    });
+
     res.status(200).json({
       success: true,
       message: `Task ${req.params.id} deleted successfully from MongoDB and cache invalidated`,
       data: deletedTask,
       cacheInvalidated: true,
-      invalidatedKeysCount: invalidatedKeys.length
+      invalidatedKeysCount: invalidatedKeys.length,
+      eventEmitted: 'task:deleted'
     });
   } catch (error) {
     next(error);
   }
 };
 
-// GET /tasks/cache/stats - Telemetry debug endpoint (Supplementary Problem 2)
+// GET /tasks/cache/stats - Telemetry debug endpoint (Practical 9)
 export const getCacheStats = (req, res) => {
   const telemetryData = getCacheTelemetry();
   res.status(200).json({
@@ -287,12 +356,32 @@ export const getCacheStats = (req, res) => {
   });
 };
 
-// DELETE /tasks/cache/flush - Reset cache debug endpoint
+// DELETE /tasks/cache/flush - Reset cache debug endpoint (Practical 9)
 export const clearCacheHandler = (req, res) => {
   const clearedCount = flushCache();
   res.status(200).json({
     success: true,
     message: `Cache successfully flushed. Cleared ${clearedCount} active in-memory key(s).`,
     clearedKeysCount: clearedCount
+  });
+};
+
+// GET /tasks/notifications - Background notification audit log (Practical 10)
+export const getNotificationsHandler = (req, res) => {
+  const logs = getNotificationLogs();
+  res.status(200).json({
+    success: true,
+    message: 'Practical 10: Background Event Notification Audit Log',
+    count: logs.length,
+    notifications: logs
+  });
+};
+
+// DELETE /tasks/notifications - Clear notification audit log (Practical 10)
+export const clearNotificationsHandler = (req, res) => {
+  const clearedCount = clearNotificationLogs();
+  res.status(200).json({
+    success: true,
+    message: `Notification log purged. Cleared ${clearedCount} notification record(s).`
   });
 };

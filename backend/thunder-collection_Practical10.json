@@ -1,0 +1,133 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 10 - Asynchronous Processing with Event-Driven Architecture",
+  "collectionId": "practical10-eventemitter-eda",
+  "dateExported": "2026-10-30T14:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    {
+      "_id": "folder-p10-auth",
+      "name": "0. Authentication (Token Setup)",
+      "containerId": "",
+      "created": "2026-10-30T14:00:00.000Z",
+      "sortNum": 5000
+    },
+    {
+      "_id": "folder-p10-async",
+      "name": "1. Asynchronous vs Synchronous Event Handling",
+      "containerId": "",
+      "created": "2026-10-30T14:00:00.000Z",
+      "sortNum": 10000
+    },
+    {
+      "_id": "folder-p10-notifications",
+      "name": "2. Background Notifications & Lifecycle Events",
+      "containerId": "",
+      "created": "2026-10-30T14:00:00.000Z",
+      "sortNum": 20000
+    }
+  ],
+  "requests": [
+    {
+      "_id": "req-p10-0",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-auth",
+      "name": "0. POST Login (Get Bearer Token)",
+      "url": "http://localhost:5000/auth/login",
+      "method": "POST",
+      "sortNum": 5000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@charusat.edu.in\",\n  \"password\": \"password123\"\n}"
+      }
+    },
+    {
+      "_id": "req-p10-1",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-async",
+      "name": "1. POST /tasks [Asynchronous Non-Blocking Event - Fast 201 Response]",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 10000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implement Native EventEmitter Notification System\",\n  \"description\": \"Dispatches task:created event in the background without blocking the HTTP response cycle\",\n  \"priority\": \"high\",\n  \"completed\": false\n}"
+      }
+    },
+    {
+      "_id": "req-p10-2",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-async",
+      "name": "2. POST /tasks?sync=true [Synchronous Blocking Mode - Delayed ~800ms]",
+      "url": "http://localhost:5000/tasks?sync=true",
+      "method": "POST",
+      "sortNum": 11000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Synchronous Notification Comparison Task\",\n  \"description\": \"Demonstrates latency degradation when background tasks run inline synchronously\",\n  \"priority\": \"medium\",\n  \"completed\": false\n}"
+      }
+    },
+    {
+      "_id": "req-p10-3",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-notifications",
+      "name": "3. GET /tasks/notifications [Inspect Background Audit Log & Timestamps]",
+      "url": "http://localhost:5000/tasks/notifications",
+      "method": "GET",
+      "sortNum": 20000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p10-4",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-notifications",
+      "name": "4. PUT /tasks/:id [Update Task - Emits task:updated Event]",
+      "url": "http://localhost:5000/tasks/{{TASK_ID}}",
+      "method": "PUT",
+      "sortNum": 21000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"completed\": true,\n  \"priority\": \"low\"\n}"
+      }
+    },
+    {
+      "_id": "req-p10-5",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-notifications",
+      "name": "5. DELETE /tasks/:id [Delete Task - Emits task:deleted Event]",
+      "url": "http://localhost:5000/tasks/{{TASK_ID}}",
+      "method": "DELETE",
+      "sortNum": 22000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p10-6",
+      "colId": "practical10-eventemitter-eda",
+      "containerId": "folder-p10-notifications",
+      "name": "6. GET /notifications [Public Live Notification Audit Feed]",
+      "url": "http://localhost:5000/notifications",
+      "method": "GET",
+      "sortNum": 23000,
+      "headers": []
+    }
+  ]
+}
