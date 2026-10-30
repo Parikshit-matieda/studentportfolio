@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practical 7 Report - Authentication and Middleware Pipeline</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text-main: #c9d1d9;
+      --text-heading: #f0f6fc;
+      --accent: #58a6ff;
+      
+      --accent-green: #3fb950;
+      --accent-purple: #bc8cff;
+      --accent-amber: #d29922;
+      --accent-red: #f85149;
+      --code-bg: #011627;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .university-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .header h1 {
+      color: var(--text-heading);
+      margin: 0.25rem 0 0.5rem 0;
+      font-size: 1.8rem;
+    }
+    .meta-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: #8b949e;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    .meta-item strong {
+      color: var(--accent);
+    }
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-title {
+      color: var(--text-heading);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+      padding-bottom: 0.5rem;
+    }
+    .section-title span {
+      color: var(--accent-green);
+    }
+    .info-box {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .diagram-box {
+      background: #040d21;
+      border: 1px dashed var(--accent-green);
+      border-radius: 8px;
+      padding: 1.2rem;
+      font-family: monospace;
+      color: var(--accent-green);
+      white-space: pre;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .qa-card {
+      background: rgba(22, 27, 34, 0.8);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .qa-question {
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .qa-answer {
+      color: var(--text-main);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: "Fira Code", Consolas, Monaco, monospace;
+      font-size: 0.85rem;
+      color: #d6deeb;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .keyword { color: #c792ea; }
+    .string { color: #ecc48d; }
+    .function { color: #82aaff; }
+    .number { color: #f78c6c; }
+    .comment { color: #637777; font-style: italic; }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-200, .badge-201 { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+    .badge-400 { background: rgba(210, 153, 34, 0.2); color: var(--accent-amber); }
+    .badge-401, .badge-500 { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Academic Header -->
+  <div class="header">
+    <div class="university-title">CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY — FTE</div>
+    <h1>Practical 7: Authentication and Middleware Pipeline</h1>
+    <div class="meta-info">
+      <div class="meta-item"><strong>Student ID:</strong> 24it049</div>
+      <div class="meta-item"><strong>Student Name:</strong> Parikshit Matieda</div>
+      <div class="meta-item"><strong>Course:</strong> Advanced Web Development Frameworks (ITUE301) | Sem: 5th</div>
+      <div class="meta-item"><strong>Department:</strong> B. Tech (IT / CE / CSE / AIML)</div>
+      <div class="meta-item"><strong>CO/PO Alignment:</strong> CO2, CO6 / PO3, PO5</div>
+    </div>
+  </div>
+
+  <!-- Objective & Overview -->
+  <div class="section">
+    <div class="section-title"><span>1.</span> Practical Objective & Overview</div>
+    <div class="info-box">
+      <strong>Objective:</strong> To implement JWT-based authentication, cryptographic password hashing with bcrypt, and server-side request input validation as part of the Express middleware pipeline protecting backend routes.
+    </div>
+    <p>
+      In Practical 7, user authentication and input validation are integrated into the full-stack Task Management application. Passwords are securely hashed before persisting to MongoDB using a Mongoose pre-save hook. Upon successful authentication, JSON Web Tokens (JWT) signed with a secure secret are issued with a 1-hour expiration. An Express authentication middleware intercepts incoming requests to protected task routes, verifies the cryptographic signature of the Bearer token, decodes the payload, and attaches the authenticated user document to <code>req.user</code>. Additionally, server-side validation middleware sanitizes incoming payloads and rejects malformed inputs prior to database execution.
+    </p>
+  </div>
+
+  <!-- Architecture & Middleware Pipeline Flow -->
+  <div class="section">
+    <div class="section-title"><span>2.</span> Architecture & Middleware Pipeline Diagram</div>
+    <p>The complete Express middleware pipeline and authentication lifecycle is diagrammed below:</p>
+
+    <div class="diagram-box">
+Registration Flow:
+POST /auth/register -> validateRegisterInput -> bcrypt.genSalt(10) -> hash password -> save User -> 201 Created (Token + User)
+
+Login Flow:
+POST /auth/login -> validateLoginInput -> find User -> bcrypt.compare() -> sign JWT (1h exp) -> 200 OK (Bearer Token)
+
+Protected Route Middleware Pipeline Flow:
+Client Request (Authorization: Bearer &lt;token&gt;)
+        |
+        v
+[Request Logger Middleware]  (logs HTTP method, URL, timestamp)
+        |
+        v
+[CORS & express.json()]      (body parsing and cross-origin headers)
+        |
+        v
+[Auth Middleware: protect]   --> verifies JWT signature & expiry --> extracts user ID --> attaches req.user
+        |
+        v
+[Validation Middleware]      --> verifies required fields (e.g., title), formats, and ObjectId params
+        |
+        v
+[Controller Execution]       --> executes Task CRUD query scoped to req.user._id in MongoDB
+        |
+        v
+[Global Error Handler]       --> catches exceptions (400, 401, 404, 500) and formats standardized JSON
+    </div>
+  </div>
+
+  <!-- Key Questions & Technical Analysis -->
+  <div class="section">
+    <div class="section-title"><span>3.</span> Key Questions & Technical Analysis</div>
+
+    <div class="qa-card">
+      <div class="qa-question">Q1: Why must passwords be hashed before storage instead of saved as plain text, even in a lab/demo project?</div>
+      <div class="qa-answer">
+        Storing plaintext passwords is a catastrophic security failure. Passwords must be hashed using a slow, salted cryptographic algorithm (such as <strong>bcrypt</strong>) for the following reasons:
+        <ul>
+          <li><strong>Breach Protection:</strong> If a database dump, backup, or unauthorized developer inspects the storage layer, hashed passwords cannot be trivially reversed.</li>
+          <li><strong>Protection Against Credential Stuffing:</strong> Because users frequently reuse passwords across multiple services (email, banking, university portals), leaking plaintext passwords compromises the user's entire digital footprint.</li>
+          <li><strong>Salting Prevents Rainbow Table Attacks:</strong> bcrypt automatically generates a unique cryptographic salt for each password, ensuring that identical passwords result in completely different hashes, neutralizing precomputed lookup table attacks.</li>
+          <li><strong>Adaptive Work Factor:</strong> bcrypt allows adjusting the cost factor (salt rounds), deliberately slowing down brute-force attacks on high-performance GPUs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question">Q2: What does the authentication middleware actually verify, and what happens if the token is missing or expired?</div>
+      <div class="qa-answer">
+        The <code>protect</code> authentication middleware performs four critical sequential checks on incoming HTTP requests:
+        <ol>
+          <li><strong>Header Format Verification:</strong> Checks that the <code>Authorization</code> request header is present and formatted according to the HTTP standard: <code>Bearer &lt;token&gt;</code>. If omitted, it immediately halts the request with <code>401 Unauthorized</code> ("No token provided").</li>
+          <li><strong>Cryptographic Signature Verification:</strong> Using <code>jwt.verify(token, secret)</code>, it validates the HMAC-SHA256 signature against the server's private <code>JWT_SECRET</code>. If the token payload has been tampered with or altered by the client, it throws a <code>JsonWebTokenError</code> and returns <code>401 Unauthorized</code>.</li>
+          <li><strong>Expiration Check (<code>exp</code> claim):</strong> The middleware checks the expiration timestamp. If the token's lifetime (e.g., 1 hour) has lapsed, it throws <code>TokenExpiredError</code>, returning a <code>401 Unauthorized</code> response instructing the client to re-authenticate.</li>
+          <li><strong>Database User Verification:</strong> Extracts <code>decoded.id</code> and queries MongoDB to confirm the user account still exists in the system before populating <code>req.user</code> and invoking <code>next()</code>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-question">Q3: Why should input validation happen on the server even if the frontend already validates the same fields?</div>
+      <div class="qa-answer">
+        Frontend validation exists strictly for <strong>User Experience (UX)</strong> to provide immediate visual feedback. It provides <strong>zero real security</strong>.
+        <ul>
+          <li><strong>Bypassability:</strong> Any client can completely circumvent frontend validation by sending raw HTTP requests using tools like cURL, Thunder Client, Postman, or automated Python scripts.</li>
+          <li><strong>Server as Source of Truth:</strong> The server-side validation middleware represents the authoritative barrier that guards data integrity. It prevents NoSQL injection, malformed documents, oversized payloads, and undefined field errors before queries reach the database.</li>
+          <li><strong>Defense in Depth:</strong> Validating inputs at both the middleware level (Express) and schema level (Mongoose) ensures strict fail-safe enforcement across all entry points.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplementary Problems Implementation -->
+  <div class="section">
+    <div class="section-title"><span>4.</span> Supplementary Problems Solutions</div>
+
+    <div class="info-box">
+      <strong>1. /me Endpoint (<code>GET /auth/me</code>):</strong><br>
+      A protected endpoint was implemented that extracts the authenticated user profile from <code>req.user</code> (decoded from the incoming JWT by <code>protect</code> middleware) and returns their name, email, role, and creation timestamp without exposing sensitive fields.
+    </div>
+
+    <div class="info-box" style="border-left-color: var(--accent-amber);">
+      <strong>2. Frontend Token Expiry & Automatic Redirect (401 Handling):</strong><br>
+      The frontend HTTP client (<code>src/services/taskApi.js</code>) intercepts any <code>401 Unauthorized</code> response from the backend, clears expired credentials from <code>localStorage</code>, emits an <code>auth:expired</code> event, and automatically redirects the user interface to the Login view with an explanatory notification.
+    </div>
+
+    <div class="info-box" style="border-left-color: var(--accent-green);">
+      <strong>3. Client-Side Logout Mechanism:</strong><br>
+      An interactive "Logout" button was added to the Task Dashboard and Navigation Bar. Triggering logout removes the stored JWT token and user metadata from <code>localStorage</code>, resets the React application state, and locks access to protected task routes.
+    </div>
+  </div>
+
+  <!-- Code Implementation Highlights -->
+  <div class="section">
+    <div class="section-title"><span>5.</span> Code Implementation Highlights</div>
+
+    <p><strong>A) User Model with bcrypt Hashing Pre-Save Hook (<code>backend/models/User.js</code>):</strong></p>
+    <div class="code-box">
+<span class="comment">// Hash password with bcrypt before saving to MongoDB</span><br>
+userSchema.<span class="function">pre</span>(<span class="string">'save'</span>, <span class="keyword">async function</span> () {<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (!<span class="keyword">this</span>.<span class="function">isModified</span>(<span class="string">'password'</span>)) <span class="keyword">return</span>;<br>
+&nbsp;&nbsp;<span class="keyword">const</span> salt = <span class="keyword">await</span> bcrypt.<span class="function">genSalt</span>(<span class="number">10</span>);<br>
+&nbsp;&nbsp;<span class="keyword">this</span>.password = <span class="keyword">await</span> bcrypt.<span class="function">hash</span>(<span class="keyword">this</span>.password, salt);<br>
+});<br><br>
+<span class="comment">// Compare password during login</span><br>
+userSchema.methods.<span class="function">matchPassword</span> = <span class="keyword">async function</span> (enteredPassword) {<br>
+&nbsp;&nbsp;<span class="keyword">return await</span> bcrypt.<span class="function">compare</span>(enteredPassword, <span class="keyword">this</span>.password);<br>
+};
+    </div>
+
+    <p><strong>B) JWT Verification & Route Protection Middleware (<code>backend/middleware/auth.js</code>):</strong></p>
+    <div class="code-box">
+<span class="keyword">export const</span> <span class="function">protect</span> = <span class="keyword">async</span> (req, res, next) =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">let</span> token;<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (req.headers.authorization && req.headers.authorization.<span class="function">startsWith</span>(<span class="string">'Bearer'</span>)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;token = req.headers.authorization.<span class="function">split</span>(<span class="string">' '</span>)[<span class="number">1</span>];<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (!token) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> res.<span class="function">status</span>(<span class="number">401</span>).<span class="function">json</span>({ success: <span class="keyword">false</span>, error: <span class="string">'Access denied. No token provided.'</span> });<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">try</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> decoded = jwt.<span class="function">verify</span>(token, process.env.JWT_SECRET);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;req.user = <span class="keyword">await</span> User.<span class="function">findById</span>(decoded.id).<span class="function">select</span>(<span class="string">'-password'</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="function">next</span>();<br>
+&nbsp;&nbsp;} <span class="keyword">catch</span> (error) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> res.<span class="function">status</span>(<span class="number">401</span>).<span class="function">json</span>({ success: <span class="keyword">false</span>, error: <span class="string">'Invalid or expired token.'</span> });<br>
+&nbsp;&nbsp;}<br>
+};
+    </div>
+
+    <p><strong>C) Server-Side Input Validation Middleware (<code>backend/middleware/validation.js</code>):</strong></p>
+    <div class="code-box">
+<span class="keyword">export const</span> <span class="function">validateTaskInput</span> = (req, res, next) =&gt; {<br>
+&nbsp;&nbsp;<span class="keyword">const</span> { title } = req.body;<br>
+&nbsp;&nbsp;<span class="keyword">if</span> (req.method === <span class="string">'POST'</span> && (!title || title.<span class="function">trim</span>().length === <span class="number">0</span>)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> res.<span class="function">status</span>(<span class="number">400</span>).<span class="function">json</span>({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;success: <span class="keyword">false</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;error: <span class="string">'Validation Error'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;details: [<span class="string">"Task 'title' is required and cannot be empty"</span>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="function">next</span>();<br>
+};
+    </div>
+  </div>
+
+  <!-- Verification & Testing Checklist -->
+  <div class="section">
+    <div class="section-title"><span>6.</span> Full Pipeline Verification & Testing Checklist</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Test Scenario</th>
+          <th>Endpoint & Method</th>
+          <th>Auth Header</th>
+          <th>Observed Status</th>
+          <th>Pipeline Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>User Registration</strong></td>
+          <td><code>POST /auth/register</code></td>
+          <td>None</td>
+          <td><span class="status-badge badge-201">201 Created</span></td>
+          <td>Bcrypt hashes password, document saved, JWT token issued</td>
+        </tr>
+        <tr>
+          <td><strong>User Login (Valid)</strong></td>
+          <td><code>POST /auth/login</code></td>
+          <td>None</td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Bcrypt compares hash, signed JWT returned with 1h expiry</td>
+        </tr>
+        <tr>
+          <td><strong>User Login (Bad Credentials)</strong></td>
+          <td><code>POST /auth/login</code></td>
+          <td>None</td>
+          <td><span class="status-badge badge-401">401 Unauthorized</span></td>
+          <td>Hash mismatch detected; access rejected with descriptive error</td>
+        </tr>
+        <tr>
+          <td><strong>Protected Route Without Token</strong></td>
+          <td><code>GET /tasks</code></td>
+          <td>None</td>
+          <td><span class="status-badge badge-401">401 Unauthorized</span></td>
+          <td>Halted by <code>protect</code> middleware: "No token provided"</td>
+        </tr>
+        <tr>
+          <td><strong>Protected Route With Token</strong></td>
+          <td><code>GET /tasks</code></td>
+          <td><code>Bearer &lt;token&gt;</code></td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>JWT verified, <code>req.user</code> set, tasks returned for user</td>
+        </tr>
+        <tr>
+          <td><strong>Inspect Profile (/me)</strong></td>
+          <td><code>GET /auth/me</code></td>
+          <td><code>Bearer &lt;token&gt;</code></td>
+          <td><span class="status-badge badge-200">200 OK</span></td>
+          <td>Decoded user payload returned directly from token context</td>
+        </tr>
+        <tr>
+          <td><strong>Input Validation (Empty Title)</strong></td>
+          <td><code>POST /tasks</code></td>
+          <td><code>Bearer &lt;token&gt;</code></td>
+          <td><span class="status-badge badge-400">400 Bad Request</span></td>
+          <td>Rejected by validation middleware before database query</td>
+        </tr>
+        <tr>
+          <td><strong>Valid Task Creation</strong></td>
+          <td><code>POST /tasks</code></td>
+          <td><code>Bearer &lt;token&gt;</code></td>
+          <td><span class="status-badge badge-201">201 Created</span></td>
+          <td>Passed validation and auth; document created under <code>req.user._id</code></td>
+        </tr>
+        <tr>
+          <td><strong>Invalid ObjectId Param</strong></td>
+          <td><code>GET /tasks/:id</code></td>
+          <td><code>Bearer &lt;token&gt;</code></td>
+          <td><span class="status-badge badge-400">400 Bad Request</span></td>
+          <td>Caught by <code>validateObjectId</code>; prevented Mongoose CastError</td>
+        </tr>
+        <tr>
+          <td><strong>Simulated Token Expiry</strong></td>
+          <td><code>GET /tasks</code></td>
+          <td>Expired Token</td>
+          <td><span class="status-badge badge-401">401 Unauthorized</span></td>
+          <td>Frontend catches 401, clears localStorage, redirects to Login view</td>
+        </tr>
+        <tr>
+          <td><strong>Client Logout</strong></td>
+          <td>Client UI Action</td>
+          <td>Local Action</td>
+          <td><span class="status-badge badge-200">Client Cleared</span></td>
+          <td>Token purged from browser, dashboard resets to login state</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Conclusion & CO/PO Alignment -->
+  <div class="section">
+    <div class="section-title"><span>7.</span> Conclusion & Learning Outcomes Achieved</div>
+    <p>
+      Practical 7 successfully implemented a production-grade authentication and middleware pipeline in Express.js and MongoDB. Passwords are cryptographically salted and hashed using bcrypt, protecting user credentials against database breaches. The application issues stateless JSON Web Tokens upon login and guards sensitive REST endpoints with custom authentication middleware. Server-side validation middleware enforces strict payload integrity prior to database execution. The React frontend seamlessly manages token storage, authenticated CRUD workflows, and automatic redirection upon token expiration.
+    </p>
+    <div class="info-box" style="margin-top: 1rem; border-left-color: var(--accent-green);">
+      <strong>Course Outcomes & Program Outcomes (CO/PO) Alignment:</strong>
+      <ul>
+        <li><strong>CO2 / PO3:</strong> Implemented Express middleware pipeline architecture, token verification mechanisms, password encryption, and modular controller design.</li>
+        <li><strong>CO6 / PO5:</strong> Designed server-side request sanitization and schema validation to secure web applications against unauthorized access, credential exposure, and malformed inputs.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

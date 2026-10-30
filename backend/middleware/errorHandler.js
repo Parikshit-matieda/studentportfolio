@@ -1,6 +1,6 @@
 // Global Error Handling Middleware with Mongoose Validation Support
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   let statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
   let errorMessage = err.message || 'Internal Server Error';
 

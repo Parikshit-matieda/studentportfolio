@@ -1,7 +1,23 @@
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { getStoredUser } from '../services/authApi';
 import './Header.css';
 
-function Header({ name, theme, toggleTheme }) {
+function Header({ _name, theme, toggleTheme }) {
+  const [user, setUser] = useState(() => getStoredUser());
+
+  useEffect(() => {
+    const checkAuth = () => setUser(getStoredUser());
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('auth:expired', checkAuth);
+    const interval = setInterval(checkAuth, 1500);
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('auth:expired', checkAuth);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <header className="navbar-header">
       <div className="header-container">
@@ -17,7 +33,21 @@ function Header({ name, theme, toggleTheme }) {
             Projects
           </NavLink>
           <NavLink to="/tasks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            Tasks (Full Stack)
+            Tasks (JWT Secured)
+            {user && (
+              <span 
+                style={{
+                  display: 'inline-block',
+                  width: '7px',
+                  height: '7px',
+                  background: '#10b981',
+                  borderRadius: '50%',
+                  marginLeft: '6px',
+                  boxShadow: '0 0 6px #10b981'
+                }} 
+                title={`Active JWT Session: ${user.name}`}
+              />
+            )}
           </NavLink>
           <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Contact
@@ -53,4 +83,3 @@ function Header({ name, theme, toggleTheme }) {
 }
 
 export default Header;
-

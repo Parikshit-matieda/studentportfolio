@@ -7,7 +7,9 @@ import connectDB from './config/db.js';
 import requestLogger from './middleware/logger.js';
 import errorHandler from './middleware/errorHandler.js';
 import taskRoutes from './routes/taskRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import Task from './models/Task.js';
+import User from './models/User.js';
 
 dotenv.config();
 
@@ -17,30 +19,45 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB Database
+// Connect to MongoDB Database and Seed Demo User & Tasks
 connectDB().then(async () => {
-  // Seed sample initial tasks if database collection is empty
   try {
+    // 1. Seed Demo User for Practical 7 Testing
+    let demoUser = await User.findOne({ email: 'demo@charusat.edu.in' });
+    if (!demoUser) {
+      demoUser = await User.create({
+        name: 'Parikshit Matieda',
+        email: 'demo@charusat.edu.in',
+        password: 'password123',
+        role: 'student'
+      });
+      console.log('👤 Seeded demo user: demo@charusat.edu.in / password123');
+    }
+
+    // 2. Seed Initial Tasks linked to demoUser if collection is empty
     const count = await Task.countDocuments();
     if (count === 0) {
       await Task.insertMany([
         {
           title: "Setup Node & Express Architecture",
           description: "Configured Express server with middleware and dotenv configuration",
-          completed: true
+          completed: true,
+          user: demoUser._id
         },
         {
-          title: "Integrate Mongoose ODM & Schema Validation",
-          description: "Connected Express backend to MongoDB database and enforced Mongoose Schema rules",
-          completed: true
+          title: "Implement JWT Authentication & Password Hashing",
+          description: "Encrypted passwords with bcrypt and issued JSON Web Tokens with 1h expiry",
+          completed: true,
+          user: demoUser._id
         },
         {
-          title: "Implement RESTful Mongoose Controller Methods",
-          description: "Replaced in-memory array operations with Mongoose find, create, findByIdAndUpdate, and findByIdAndDelete",
-          completed: false
+          title: "Configure Express Middleware Pipeline & Validation",
+          description: "Protected task CRUD routes and added server-side schema & ObjectId validation",
+          completed: false,
+          user: demoUser._id
         }
       ]);
-      console.log('🌱 Initial database seed completed successfully!');
+      console.log('🌱 Initial database seed completed with demo user association!');
     }
   } catch (err) {
     console.error('Seed database error:', err.message);
@@ -57,7 +74,24 @@ app.use(requestLogger);
 // Serve Static Frontend / Interactive API Test Suite
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 3. Mount Express Router for Task REST API
+// 3. Mount Authentication Routes (/auth/register, /auth/login, /auth/me)
+app.use('/auth', authRoutes);
+
+import { getCacheTelemetry } from './config/cache.js';
+
+// Also mount at root for direct /register, /login, /me support as specified in lab prompt
+app.use('/', authRoutes);
+
+// Public Cache Telemetry Endpoint (Supplementary Problem 2)
+app.get('/cache/stats', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Practical 9: In-Memory Cache Telemetry (node-cache)',
+    telemetry: getCacheTelemetry()
+  });
+});
+
+// 4. Mount Express Router for Task REST API (Protected by auth & validation pipeline)
 app.use('/tasks', taskRoutes);
 
 // Explicit Route to Demonstrate Global Error Handling Middleware (500 Status)
@@ -66,8 +100,8 @@ app.get('/error-test', (req, res, next) => {
   next(err);
 });
 
-// 4. Handle 404 for Undefined API Routes
-app.use((req, res, next) => {
+// 5. Handle 404 for Undefined API Routes
+app.use((req, res, _next) => {
   res.status(404).json({
     success: false,
     status: 404,
@@ -76,20 +110,26 @@ app.use((req, res, next) => {
   });
 });
 
-// 5. Global Error Handling Middleware (Must be defined last)
+// 6. Global Error Handling Middleware (Must be defined last)
 app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`====================================================================`);
-  console.log(`🚀 Task REST API Backend Server Running (Practical 5 - MongoDB & Mongoose)`);
+  console.log(`🚀 Task Management API Running (Practical 9 - In-Memory Caching & Optimization)`);
   console.log(`📍 Base URL: http://localhost:${PORT}`);
-  console.log(`📌 Endpoints:`);
-  console.log(`   - GET    /tasks         (getAllTasks)`);
-  console.log(`   - GET    /tasks/:id     (getTaskById)`);
-  console.log(`   - POST   /tasks         (createTask)`);
-  console.log(`   - PUT    /tasks/:id     (updateTask)`);
-  console.log(`   - DELETE /tasks/:id     (deleteTask)`);
-  console.log(`   - GET    /error-test    (Global Error Handler Test)`);
+  console.log(`📌 Public Auth Endpoints:`);
+  console.log(`   - POST   /auth/register (or /register) - Register user + hash bcrypt password`);
+  console.log(`   - POST   /auth/login    (or /login)    - Verify bcrypt + generate JWT token`);
+  console.log(`   - GET    /cache/stats                  - View in-memory cache telemetry & hit/miss stats`);
+  console.log(`📌 Protected Endpoints (Requires Authorization: Bearer <token>):`);
+  console.log(`   - GET    /auth/me                      - Return current user from decoded JWT`);
+  console.log(`   - GET    /tasks                        - Fetch all tasks (Cached with node-cache, 60s TTL)`);
+  console.log(`   - GET    /tasks/:id                    - Fetch single task (Cached separately)`);
+  console.log(`   - POST   /tasks                        - Create task (Invalidates cache on write)`);
+  console.log(`   - PUT    /tasks/:id                    - Update task (Invalidates cache on write)`);
+  console.log(`   - DELETE /tasks/:id                    - Delete task (Invalidates cache on write)`);
+  console.log(`   - GET    /tasks/cache/stats            - Detailed cache telemetry debug endpoint`);
+  console.log(`   - POST   /tasks/cache/flush            - Manually flush and reset cache`);
   console.log(`====================================================================`);
 });
 

@@ -1,0 +1,137 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 7 - JWT Authentication & Middleware Pipeline",
+  "collectionId": "practical7-jwt-auth-pipeline",
+  "dateExported": "2026-10-21T18:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    {
+      "_id": "folder-auth",
+      "name": "1. Authentication Endpoints",
+      "containerId": "",
+      "created": "2026-10-21T18:00:00.000Z",
+      "sortNum": 10000
+    },
+    {
+      "_id": "folder-tasks",
+      "name": "2. Protected Tasks & Middleware Pipeline",
+      "containerId": "",
+      "created": "2026-10-21T18:00:00.000Z",
+      "sortNum": 20000
+    }
+  ],
+  "requests": [
+    {
+      "_id": "req-p7-1",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-auth",
+      "name": "1. POST Register New User (bcrypt hashing)",
+      "url": "http://localhost:5000/auth/register",
+      "method": "POST",
+      "sortNum": 10000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Student Researcher\",\n  \"email\": \"student@charusat.edu.in\",\n  \"password\": \"charusat2026\"\n}"
+      }
+    },
+    {
+      "_id": "req-p7-2",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-auth",
+      "name": "2. POST Login (Verify bcrypt & generate JWT)",
+      "url": "http://localhost:5000/auth/login",
+      "method": "POST",
+      "sortNum": 20000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@charusat.edu.in\",\n  \"password\": \"password123\"\n}"
+      }
+    },
+    {
+      "_id": "req-p7-3",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-auth",
+      "name": "3. GET /me (Decoded JWT User Profile)",
+      "url": "http://localhost:5000/auth/me",
+      "method": "GET",
+      "sortNum": 30000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p7-4",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-tasks",
+      "name": "4. GET Tasks Without Token (Expected 401)",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 40000,
+      "headers": []
+    },
+    {
+      "_id": "req-p7-5",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-tasks",
+      "name": "5. GET Tasks With JWT Token (Expected 200)",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 50000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p7-6",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-tasks",
+      "name": "6. POST Tasks Validation Error - Blank Title (Expected 400)",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 60000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"   \",\n  \"description\": \"Missing title should trigger server-side 400 validation error\"\n}"
+      }
+    },
+    {
+      "_id": "req-p7-7",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-tasks",
+      "name": "7. POST Tasks Valid (Authenticated Create)",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 70000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implement Express Auth Pipeline\",\n  \"description\": \"Secured with JWT and server-side validation middleware\"\n}"
+      }
+    },
+    {
+      "_id": "req-p7-8",
+      "colId": "practical7-jwt-auth-pipeline",
+      "containerId": "folder-tasks",
+      "name": "8. GET Tasks with Invalid ObjectId (Expected 400)",
+      "url": "http://localhost:5000/tasks/invalid-object-id-123",
+      "method": "GET",
+      "sortNum": 80000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Practical 9 - In-Memory Caching & Query Optimization",
+  "collectionId": "practical9-in-memory-caching",
+  "dateExported": "2026-10-30T10:00:00.000Z",
+  "version": "1.0",
+  "folders": [
+    {
+      "_id": "folder-auth-p9",
+      "name": "0. Authentication (Token Setup)",
+      "containerId": "",
+      "created": "2026-10-30T10:00:00.000Z",
+      "sortNum": 5000
+    },
+    {
+      "_id": "folder-caching-core",
+      "name": "1. Core Caching & Latency Measurement (GET /tasks)",
+      "containerId": "",
+      "created": "2026-10-30T10:00:00.000Z",
+      "sortNum": 10000
+    },
+    {
+      "_id": "folder-invalidation",
+      "name": "2. Cache Invalidation on Mutation (POST/PUT/DELETE)",
+      "containerId": "",
+      "created": "2026-10-30T10:00:00.000Z",
+      "sortNum": 20000
+    },
+    {
+      "_id": "folder-supplementary",
+      "name": "3. Supplementary Problems (Single-Task & Telemetry)",
+      "containerId": "",
+      "created": "2026-10-30T10:00:00.000Z",
+      "sortNum": 30000
+    }
+  ],
+  "requests": [
+    {
+      "_id": "req-p9-0",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-auth-p9",
+      "name": "0. POST Login (Obtain JWT Token)",
+      "url": "http://localhost:5000/auth/login",
+      "method": "POST",
+      "sortNum": 5000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@charusat.edu.in\",\n  \"password\": \"password123\"\n}"
+      }
+    },
+    {
+      "_id": "req-p9-1",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-caching-core",
+      "name": "1. GET /tasks [1st Request - Cache MISS, DB Query]",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 10000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-2",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-caching-core",
+      "name": "2. GET /tasks [2nd Request - Cache HIT (Sample 1)]",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 11000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-3",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-caching-core",
+      "name": "3. GET /tasks [3rd Request - Cache HIT (Sample 2)]",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 12000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-4",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-caching-core",
+      "name": "4. GET /tasks [4th Request - Cache HIT (Sample 3)]",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 13000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-5",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-caching-core",
+      "name": "5. GET /tasks?cache=false [Uncached DB Benchmark]",
+      "url": "http://localhost:5000/tasks?cache=false",
+      "method": "GET",
+      "sortNum": 14000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-6",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-invalidation",
+      "name": "6. POST /tasks [Write Mutation - Invalidates Cache]",
+      "url": "http://localhost:5000/tasks",
+      "method": "POST",
+      "sortNum": 20000,
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implement node-cache Invalidation Logic\",\n  \"description\": \"Write mutation triggers automatic cache purge to avoid stale data\",\n  \"priority\": \"high\",\n  \"completed\": false\n}"
+      }
+    },
+    {
+      "_id": "req-p9-7",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-invalidation",
+      "name": "7. GET /tasks [Immediate Call After Mutation - Cache MISS with Fresh Data]",
+      "url": "http://localhost:5000/tasks",
+      "method": "GET",
+      "sortNum": 21000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-8",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-supplementary",
+      "name": "8. GET /tasks/cache/stats [Telemetry Debug Endpoint]",
+      "url": "http://localhost:5000/tasks/cache/stats",
+      "method": "GET",
+      "sortNum": 30000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req-p9-9",
+      "colId": "practical9-in-memory-caching",
+      "containerId": "folder-supplementary",
+      "name": "9. GET /tasks/:id [Single-Task Endpoint - Cache MISS then HIT]",
+      "url": "http://localhost:5000/tasks/{{TASK_ID}}",
+      "method": "GET",
+      "sortNum": 31000,
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+      ]
+    }
+  ]
+}

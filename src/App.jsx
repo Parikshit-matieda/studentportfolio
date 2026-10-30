@@ -1,12 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
-import Home from './components/Home';
-import Projects from './components/Projects';
-import Tasks from './components/Tasks';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
+import ScrollProgressBar from './components/ScrollProgressBar';
+import PageLoader from './components/PageLoader';
+import { lazyWithDelay } from './utils/lazyWithDelay';
 import PostgresLogo from './components/PostgresLogo';
+
+/* ─── Practical 8: Route-based Code Splitting using React.lazy() ───
+   lazyWithDelay adds a smooth 300ms minimum threshold to prevent
+   loading flash/flicker on ultra-fast broadband connections.
+   Each route is split into its own independently cached JavaScript chunk! ─── */
+const Home = lazyWithDelay(() => import('./components/Home'), 300);
+const Projects = lazyWithDelay(() => import('./components/Projects'), 300);
+const Tasks = lazyWithDelay(() => import('./components/Tasks'), 300);
+const Contact = lazyWithDelay(() => import('./components/Contact'), 300);
 
 /* ─── Data passed as props to components ─── */
 const studentName = "Parikshit Matieda";
@@ -196,24 +204,11 @@ function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'light';
   });
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const currentScroll = window.scrollY || window.pageYOffset;
-      if (totalScroll > 0) {
-        setScrollProgress((currentScroll / totalScroll) * 100);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
@@ -223,11 +218,8 @@ function App() {
     <HashRouter>
       <ScrollToTop />
       <div className="app">
-        {/* Scroll Progress Bar */}
-        <div 
-          className="scroll-progress-bar" 
-          style={{ width: `${scrollProgress}%` }}
-        ></div>
+        {/* Supplementary Problem: Isolated ScrollProgressBar eliminates App re-renders on scroll */}
+        <ScrollProgressBar />
 
         {/* Props: name, theme, toggleTheme */}
         <Header 
@@ -237,24 +229,26 @@ function App() {
         />
 
         <main className="main-content">
-          <Routes>
-            <Route 
-              path="/" 
-              element={<Home name={studentName} title={studentTitle} skills={skillsData} />} 
-            />
-            <Route 
-              path="/projects" 
-              element={<Projects projects={projectsData} />} 
-            />
-            <Route 
-              path="/tasks" 
-              element={<Tasks />} 
-            />
-            <Route 
-              path="/contact" 
-              element={<Contact email={contactEmail} />} 
-            />
-          </Routes>
+          <Suspense fallback={<PageLoader message="Loading requested view..." />}>
+            <Routes>
+              <Route 
+                path="/" 
+                element={<Home name={studentName} title={studentTitle} skills={skillsData} />} 
+              />
+              <Route 
+                path="/projects" 
+                element={<Projects projects={projectsData} />} 
+              />
+              <Route 
+                path="/tasks" 
+                element={<Tasks />} 
+              />
+              <Route 
+                path="/contact" 
+                element={<Contact email={contactEmail} />} 
+              />
+            </Routes>
+          </Suspense>
         </main>
 
         {/* Props: email, socialLinks */}

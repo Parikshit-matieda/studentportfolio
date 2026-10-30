@@ -17,13 +17,19 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    createdAt: {
-      type: Date,
-      default: Date.now
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium'
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false
     }
   },
   {
-    versionKey: false
+    timestamps: true
   }
 );
 
